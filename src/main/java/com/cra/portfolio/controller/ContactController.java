@@ -2,6 +2,8 @@ package com.cra.portfolio.controller;
 
 import com.cra.portfolio.dto.ContactRequest;
 import com.cra.portfolio.dto.ContactResponse;
+import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +23,8 @@ public class ContactController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createContact(@RequestBody ContactRequest contactRequest){
-        contactService.createContact(contactRequest);
+    public ContactResponse createContact(@RequestBody ContactRequest contactRequest){
+        return contactService.createContact(contactRequest);
     }
 
     @GetMapping
@@ -44,21 +46,27 @@ public class ContactController {
     }
 
 
-    @PutMapping("/{applicationId}/contact/link/{contactId}")
+
+
+    @PutMapping("/{contactId}/application/link/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContactResponse> addAppToContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId ) {
-        ContactResponse updatedContact = contactService.addAppToContact(contactId,applicationId);
+    public ResponseEntity<ContactResponse> addAppToContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId, @RequestBody ContactRequest contactRequest ) {
+        ContactResponse updatedContact = contactService.addAppToContact(contactId,applicationId,contactRequest);
         return ResponseEntity.ok(updatedContact);
     }
 
-    @PutMapping("/{applicationId}/contact/unlink/{contactId}")
+
+    @PutMapping("/{contactId}/application/unlink/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContactResponse> removeAppToContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId ) {
+    public ResponseEntity<ContactResponse> removeAppFromContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId ) {
         ContactResponse updatedContact = contactService.removeAppFromContact(contactId,applicationId);
         return ResponseEntity.ok(updatedContact);
     }
 
-
+    @GetMapping("/{contactId}/applications")
+    public List<Application> getNonArchivedContactApplications(@PathVariable Integer contactId) {
+        return contactService.getNonArchivedContactApplications(contactId);
+    }
 
     @GetMapping("/archived")
     public ResponseEntity<List<ContactResponse>> getAllArchivedContacts(

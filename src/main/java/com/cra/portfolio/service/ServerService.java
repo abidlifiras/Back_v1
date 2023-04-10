@@ -49,7 +49,7 @@ public class ServerService {
     }
 
 
-    public ServerResponse addAppToServer(Integer serverId, Integer applicationId) {
+    public ServerResponse addAppToServer(Integer serverId, Integer applicationId,ServerRequest serverRequest) {
         Optional<Server> optionalServer = serverRepository.findById(serverId);
         if (optionalServer.isPresent()) {
             Server server = optionalServer.get();
@@ -62,6 +62,18 @@ public class ServerService {
                 applications.add(application);
                 application.getServers().add(server);
                 server.setApplications(applications);
+                server.setServerName(serverRequest.getServerName());
+                server.setDataSource(serverRequest.getDataSource());
+                server.setType(serverRequest.getType());
+                server.setRole(serverRequest.getRole());
+                server.setCurrentNumberOfCores(serverRequest.getCurrentNumberOfCores());
+                server.setCurrentRamGb(serverRequest.getCurrentRamGb());
+                server.setCurrentDiskGb(serverRequest.getCurrentDiskGb());
+                server.setPowerStatus(serverRequest.getPowerStatus());
+                server.setServerNotes(serverRequest.getServerNotes());
+                server.setIpAddress(serverRequest.getIpAddress());
+                server.setOperatingSystem(serverRequest.getOperatingSystem());
+                server.setModifiedAt(LocalDateTime.now());
 
                 Server updatedServer = serverRepository.save(server);
                 return mapToServerResponse(updatedServer);
@@ -94,7 +106,7 @@ public class ServerService {
             throw new NotFoundCustomException("Server not found with id: " + serverId);
         }
     }
-    public ServerResponse addDbToServer(Integer serverId, Integer dbId) {
+    public ServerResponse addDbToServer(Integer serverId, Integer dbId,ServerRequest serverRequest) {
         Optional<Server> optionalServer = serverRepository.findById(serverId);
         if (optionalServer.isPresent()) {
             Server server = optionalServer.get();
@@ -104,9 +116,20 @@ public class ServerService {
             }
             List<Database> databases = server.getDatabaseList();
             if (!databases.contains(database)) {
-                server.addDatabase(database);
-                database.addServer(server);
+                server.getDatabaseList().add(database);
                 server.setDatabaseList((databases));
+                server.setServerName(serverRequest.getServerName());
+                server.setDataSource(serverRequest.getDataSource());
+                server.setType(serverRequest.getType());
+                server.setRole(serverRequest.getRole());
+                server.setCurrentNumberOfCores(serverRequest.getCurrentNumberOfCores());
+                server.setCurrentRamGb(serverRequest.getCurrentRamGb());
+                server.setCurrentDiskGb(serverRequest.getCurrentDiskGb());
+                server.setPowerStatus(serverRequest.getPowerStatus());
+                server.setServerNotes(serverRequest.getServerNotes());
+                server.setIpAddress(serverRequest.getIpAddress());
+                server.setOperatingSystem(serverRequest.getOperatingSystem());
+                server.setModifiedAt(LocalDateTime.now());
                 Server updatedServer = serverRepository.save(server);
                 return mapToServerResponse(updatedServer);
             } else {
@@ -124,7 +147,7 @@ public class ServerService {
 
             List<Database> databases = server.getDatabaseList();
             if (databases.contains(database)) {
-                server.removeDatabase(database);
+                server.getDatabaseList().remove(database);
                 database.removeServer(server);
                 Server updatedServer = serverRepository.save(server);
                 return mapToServerResponse(updatedServer);
@@ -143,7 +166,7 @@ public class ServerService {
             List<Application> applications = new ArrayList<>();
             for (Application application : server.getApplications()) {
                 for (Server AppServer : application.getServers()) {
-                    if (AppServer.getId().equals(server.getId()) && server.getDeletedAt() != null ) {
+                    if (AppServer.getId().equals(server.getId()) && application.getDeletedAt() != null ) {
                         applications.add(application);
                         break;
                     }
@@ -161,7 +184,7 @@ public class ServerService {
             List<Database> databases = new ArrayList<>();
             for (Database database : server.getDatabaseList()) {
                 for (Server DbServer : database.getServerList()) {
-                    if (DbServer.getId().equals(server.getId()) && server.getDeletedAt() != null ) {
+                    if (DbServer.getId().equals(server.getId()) && database.getDeletedAt() != null ) {
                         databases.add(database);
                         break;
                     }
@@ -212,6 +235,9 @@ public class ServerService {
             Server server = optionalServer.get();
             for (Application application : server.getApplications()) {
                 application.getServers().remove(server);
+            }
+            for (Database database : server.getDatabaseList()) {
+                database.getServerList().remove(server);
             }
             serverRepository.delete(optionalServer.get());
         } else {

@@ -4,6 +4,7 @@ import com.cra.portfolio.dto.DatabaseResponse;
 import com.cra.portfolio.dto.ServerResponse;
 import com.cra.portfolio.exception.NotFoundCustomException;
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Database;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.repository.DatabaseRepository;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,15 +27,15 @@ public class DatabaseService {
     private final ServerRepository serverRepository;
 
 
-    //add server object to application
-    //get by name id ... only if not archived !!!
-    public void createDatabase(DatabaseRequest databaseRequest) {
+
+    public DatabaseResponse createDatabase(DatabaseRequest databaseRequest) {
         Database database = Database.builder()
                 .databaseName(databaseRequest.getNameDb())
                 .databaseVersion(databaseRequest.getVersionDb())
                 .build();
         databaseRepository.save(database);
         log.info("database {} created successfully", database.getDatabaseId());
+        return mapToDatabaseResponse(database);
     }
     public DatabaseResponse addServerToDb(Integer dbId, Integer serverId, DatabaseRequest databaseRequest) {
         Optional<Database> optionalDatabase = databaseRepository.findById(dbId);
@@ -46,10 +48,11 @@ public class DatabaseService {
             List<Server> servers = database.getServerList();
             if (!servers.contains(server)) {
                 servers.add(server);
-                server.addDatabase(database);
+                server.getDatabaseList().add(database);
                 database.setServerList(servers);
                 database.setDatabaseName(databaseRequest.getNameDb());
                 database.setDatabaseVersion(databaseRequest.getVersionDb());
+                database.setModifiedAt(LocalDateTime.now());
                 Database updatedDatabase = databaseRepository.save(database);
                 return mapToDatabaseResponse(updatedDatabase);
             } else {
@@ -68,7 +71,7 @@ public class DatabaseService {
             List<Server> servers = database.getServerList();
             if (servers.contains(server)) {
                 servers.remove(server);
-                server.removeDatabase(database);
+                server.getDatabaseList().remove(database);
 
                 database.setServerList(servers);
                 Database updatedDatabase = databaseRepository.save(database);
@@ -88,7 +91,7 @@ public class DatabaseService {
             List<Server> servers = new ArrayList<>();
             for (Server server : database.getServerList()) {
                 for (Database serverDb : server.getDatabaseList()) {
-                    if (serverDb.getDatabaseId().equals(database.getDatabaseId()) && database.getDeletedAt()==null) {
+                    if (serverDb.getDatabaseId().equals(database.getDatabaseId()) && server.getDeletedAt()==null) {
                         servers.add(server);
                         break;
                     }
@@ -112,6 +115,9 @@ public class DatabaseService {
                         .nameDb(database.getDatabaseName())
                         .versionDb(database.getDatabaseVersion())
                         .serverList(database.getServerList())
+                                .createdAt(database.getCreatedAt())
+                                .modifiedAt(database.getModifiedAt())
+                                .deletedAt(database.getDeletedAt())
                         .build())
         );
 
@@ -131,6 +137,9 @@ public class DatabaseService {
                         .nameDb(database.getDatabaseName())
                         .versionDb(database.getDatabaseVersion())
                         .serverList(database.getServerList())
+                        .createdAt(database.getCreatedAt())
+                        .modifiedAt(database.getModifiedAt())
+                        .deletedAt(database.getDeletedAt())
                         .build())
         );
 
@@ -152,6 +161,9 @@ public class DatabaseService {
                         .nameDb(database.getDatabaseName())
                         .versionDb(database.getDatabaseVersion())
                         .serverList(database.getServerList())
+                        .createdAt(database.getCreatedAt())
+                        .modifiedAt(database.getModifiedAt())
+                        .deletedAt(database.getDeletedAt())
                         .build())
         );
 
@@ -168,8 +180,23 @@ public class DatabaseService {
             }
             databaseRepository.delete(optionalDatabase.get());
         } else {
-            throw new NotFoundCustomException("Application not found with id: " + id);
+            throw new NotFoundCustomException("Database not found with id: " + id);
         }
+    }
+
+    public void deleteDatabaseSoft(Integer id) {
+        Optional<Database> optionalDatabase = databaseRepository.findById(id);
+
+        if (optionalDatabase.isPresent()) {
+            Database database = optionalDatabase.get();
+            database.setDeletedAt(LocalDateTime.now());
+            databaseRepository.save(database);
+            log.info("database {} archived successfully", database.getDatabaseId());
+        } else {
+            throw new NotFoundCustomException("Database not found with id: " + id);
+        }
+
+
     }
     public DatabaseResponse updateDatabase(Integer id, DatabaseRequest databaseRequest) {
         Optional<Database> optionalDatabase = databaseRepository.findById(id);
@@ -177,7 +204,9 @@ public class DatabaseService {
             Database database = optionalDatabase.get();
             database.setDatabaseName(databaseRequest.getNameDb());
             database.setDatabaseVersion(databaseRequest.getVersionDb());
+            database.setModifiedAt(LocalDateTime.now());
             Database updatedDatabase = databaseRepository.save(database);
+
             return mapToDatabaseResponse(updatedDatabase);
         } else {
             throw new NotFoundCustomException("Database not found with id: " + id);

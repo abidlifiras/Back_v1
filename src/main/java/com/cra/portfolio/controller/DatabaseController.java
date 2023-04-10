@@ -1,7 +1,10 @@
 package com.cra.portfolio.controller;
 
+import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.dto.DatabaseRequest;
 import com.cra.portfolio.dto.DatabaseResponse;
+import com.cra.portfolio.dto.ServerResponse;
+import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,18 +26,11 @@ public class DatabaseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createDatabase(@RequestBody DatabaseRequest databaseRequest){
-        databaseService.createDatabase(databaseRequest);
+    public DatabaseResponse createDatabase(@RequestBody DatabaseRequest databaseRequest){
+        return databaseService.createDatabase(databaseRequest);
     }
 
-    @GetMapping(
-            consumes = {
-                    MediaType.APPLICATION_JSON_VALUE ,
-                    MediaType.APPLICATION_XML_VALUE},
-            produces= {
-                    MediaType.APPLICATION_JSON_VALUE ,
-                    MediaType.APPLICATION_XML_VALUE
-            })
+    @GetMapping()
     public ResponseEntity<List<DatabaseResponse>> getDatabases(
             @RequestParam(defaultValue = "5", required = false)
             Integer pageSize,
@@ -58,6 +54,52 @@ public class DatabaseController {
         DatabaseResponse updatedDatabase = databaseService.addServerToDb(databaseId ,serverId, databaseRequest);
         return ResponseEntity.ok(updatedDatabase);
     }
+    @PutMapping("/{databaseId}/server/unlink/{serverId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<DatabaseResponse> removeServerFromDb(@PathVariable Integer databaseId , @PathVariable Integer serverId ) {
+        DatabaseResponse updatedDatabase = databaseService.removeServerFromDb(databaseId ,serverId);
+        return ResponseEntity.ok(updatedDatabase);
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<DatabaseResponse>> getAllArchivedDatabases(
+            @RequestParam(defaultValue = "5", required = false)
+            Integer pageSize,
+            @RequestParam(defaultValue = "0", required = false)
+            Integer page
+
+    ) {
+
+        Pageable paging  = PageRequest.of(page, pageSize);
+
+        List<DatabaseResponse> databaseResponses =
+                databaseService.getAllArchivedDatabases(paging);
+
+        return new ResponseEntity<>(
+                databaseResponses, HttpStatus.CREATED);
+    }
+    @GetMapping("/{databaseId}/servers")
+    public List<Server> getNonArchivedDatabaseServers(@PathVariable Integer databaseId) {
+        return databaseService.getNonArchivedDatabaseServers(databaseId);
+    }
+    @GetMapping("/non-archived")
+    public ResponseEntity<List<DatabaseResponse>> getAllNonArchivedDatabase(
+            @RequestParam(defaultValue = "5", required = false)
+            Integer pageSize,
+            @RequestParam(defaultValue = "0", required = false)
+            Integer page
+
+    ) {
+
+        Pageable paging  = PageRequest.of(page, pageSize);
+
+        List<DatabaseResponse> databaseResponses =
+                databaseService.getAllNonArchivedDatabases(paging);
+
+        return new ResponseEntity<>(
+                databaseResponses, HttpStatus.CREATED);
+    }
+
 
     @DeleteMapping("/{id}/hard")
     public ResponseEntity<DatabaseResponse> deleteDatabaseById(@PathVariable Integer id) {
@@ -70,7 +112,16 @@ public class DatabaseController {
         DatabaseResponse updatedDatabase = databaseService.updateDatabase(id, databaseRequest);
         return ResponseEntity.ok(updatedDatabase);
     }
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDatabaseSoft(@PathVariable Integer id) {
+        databaseService.deleteDatabaseSoft(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public DatabaseResponse findDatabaseById(@PathVariable Integer id) {
+        return databaseService.findById(id);
+    }
 
 
 

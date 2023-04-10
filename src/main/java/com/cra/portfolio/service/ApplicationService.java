@@ -118,7 +118,7 @@ public class ApplicationService {
             throw new NotFoundCustomException("Application not found with id: " + applicationId);
         }
     }*/
-    public ApplicationResponse addServerToApp(Integer applicationId, Integer serverId) {
+    public ApplicationResponse addServerToApp(Integer applicationId, Integer serverId, ApplicationRequest applicationRequest) {
         Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
@@ -131,6 +131,9 @@ public class ApplicationService {
                 servers.add(server);
                 server.getApplications().add(application);
                  application.setServers(servers);
+                application.setAppName(applicationRequest.getAppName());
+                application.setAppDescription(applicationRequest.getAppDescription());
+                application.setModifiedAt(LocalDateTime.now());
                  Application updatedApplication = applicationRepository.save(application);
             return mapToApplicationResponse(updatedApplication);
         } else {
@@ -141,7 +144,7 @@ public class ApplicationService {
     }
 }
 
-    public ApplicationResponse addContactToApp(Integer applicationId, Integer contactId) {
+    public ApplicationResponse addContactToApp(Integer applicationId, Integer contactId,ApplicationRequest applicationRequest) {
         Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
@@ -152,8 +155,11 @@ public class ApplicationService {
             List<Contact> contacts = application.getContacts();
             if (!contacts.contains(contact)) {
                 contacts.add(contact);
-                contact.addApplication(application);
+                contact.getApplications().add(application);
                 application.setContacts(contacts);
+                application.setAppName(applicationRequest.getAppName());
+                application.setAppDescription(applicationRequest.getAppDescription());
+                application.setModifiedAt(LocalDateTime.now());
                 Application updatedApplication = applicationRepository.save(application);
                 return mapToApplicationResponse(updatedApplication);
             } else {
@@ -216,7 +222,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         List<Server> servers = new ArrayList<>();
         for (Server server : application.getServers()) {
             for (Application serverApp : server.getApplications()) {
-                if (serverApp.getId().equals(application.getId()) && application.getDeletedAt()==null) {
+                if (serverApp.getId().equals(application.getId()) && server.getDeletedAt()==null) {
                     servers.add(server);
                     break;
                 }
@@ -227,6 +233,24 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         throw new NotFoundCustomException("Application not found with id: " + appId);
     }
 }
+    public List<Contact> getNonArchivedApplicationContacts(Integer appId) {
+        Optional<Application> optionalApplication = applicationRepository.findById(appId);
+        if (optionalApplication.isPresent()) {
+            Application application = optionalApplication.get();
+            List<Contact> contacts = new ArrayList<>();
+            for (Contact contact : application.getContacts()) {
+                for (Application contactApp : contact.getApplications()) {
+                    if (contactApp.getId().equals(application.getId()) && contact.getDeletedAt()==null) {
+                        contacts.add(contact);
+                        break;
+                    }
+                }
+            }
+            return contacts;
+        } else {
+            throw new NotFoundCustomException("Application not found with id: " + appId);
+        }
+    }
 
 
 
@@ -263,6 +287,9 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
             Application application = optionalApplication.get();
             for (Server server : application.getServers()) {
                 server.getApplications().remove(application);
+            }
+            for (Contact contact : application.getContacts()) {
+                contact.getApplications().remove(application);
             }
             applicationRepository.delete(optionalApplication.get());
         } else {

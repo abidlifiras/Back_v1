@@ -5,6 +5,7 @@ import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.dto.ServerRequest;
 import com.cra.portfolio.dto.ServerResponse;
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.Database;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.ApplicationService;
 import com.cra.portfolio.service.ServerService;
@@ -52,14 +53,27 @@ public class ServerController {
 
     @PutMapping("/{serverId}/application/link/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ServerResponse> addAppToServer(@PathVariable Integer serverId ,@PathVariable Integer applicationId ) {
-        ServerResponse updatedServer = serverService.addAppToServer(serverId,applicationId);
+    public ResponseEntity<ServerResponse> addAppToServer(@PathVariable Integer serverId ,@PathVariable Integer applicationId, @RequestBody ServerRequest serverRequest ) {
+        ServerResponse updatedServer = serverService.addAppToServer(serverId,applicationId, serverRequest);
         return ResponseEntity.ok(updatedServer);
     }
     @PutMapping("/{serverId}/application/unlink/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ServerResponse> removeAppFromServer(@PathVariable Integer serverId ,@PathVariable Integer applicationId) {
         ServerResponse updatedServer = serverService.removeAppFromServer(serverId,applicationId);
+        return ResponseEntity.ok(updatedServer);
+    }
+
+    @PutMapping("/{serverId}/database/link/{DbId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ServerResponse> addDbToServer(@PathVariable Integer serverId ,@PathVariable Integer DbId, @RequestBody ServerRequest serverRequest ) {
+        ServerResponse updatedServer = serverService.addDbToServer(serverId,DbId, serverRequest);
+        return ResponseEntity.ok(updatedServer);
+    }
+    @PutMapping("/{serverId}/database/unlink/{dbId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ServerResponse> removeDbFromServer(@PathVariable Integer serverId ,@PathVariable Integer dbId) {
+        ServerResponse updatedServer = serverService.removeDbFromServer(serverId,dbId);
         return ResponseEntity.ok(updatedServer);
     }
 
@@ -84,6 +98,10 @@ public class ServerController {
     @GetMapping("/{serverId}/applications")
     public List<Application> getNonArchivedServerApplications(@PathVariable Integer serverId) {
         return serverService.getNonArchivedServerApplications(serverId);
+    }
+    @GetMapping("/{serverId}/databases")
+    public List<Database> getNonArchivedServerDatabases(@PathVariable Integer serverId) {
+        return serverService.getNonArchivedServerDatabases(serverId);
     }
 
     @GetMapping("/non-archived")

@@ -2,9 +2,12 @@ package com.cra.portfolio.controller;
 
 import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
+import com.cra.portfolio.dto.ContactResponse;
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.ApplicationService;
+import com.cra.portfolio.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +26,7 @@ public class ApplicationController {
     //needs refactoring , optimizations , response entity<> , exception handling , logic for finds , pagination
 
     private final ApplicationService applicationService;
+    private  final ContactService contactService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -57,8 +61,8 @@ public class ApplicationController {
 
     @PutMapping("/{applicationId}/server/link/{serverId}")
     @ResponseStatus(HttpStatus.OK)
-        public ResponseEntity<ApplicationResponse> addServerToApp(@PathVariable Integer applicationId ,@PathVariable Integer serverId ) {
-            ApplicationResponse updatedApplication = applicationService.addServerToApp(applicationId,serverId);
+        public ResponseEntity<ApplicationResponse> addServerToApp(@PathVariable Integer applicationId ,@PathVariable Integer serverId,@RequestBody ApplicationRequest applicationRequest ) {
+            ApplicationResponse updatedApplication = applicationService.addServerToApp(applicationId,serverId, applicationRequest);
             return ResponseEntity.ok(updatedApplication);
     }
 
@@ -68,6 +72,23 @@ public class ApplicationController {
         ApplicationResponse updatedApplication = applicationService.removeServerFromApp(applicationId,serverId);
         return ResponseEntity.ok(updatedApplication);
     }
+
+
+    @PutMapping("/{applicationId}/contact/link/{contactId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApplicationResponse> addContactToApp(@PathVariable Integer applicationId , @PathVariable Integer contactId, @RequestBody ApplicationRequest applicationRequest ) {
+        ApplicationResponse updatedApplication = applicationService.addContactToApp(applicationId,contactId, applicationRequest);
+        return ResponseEntity.ok(updatedApplication);
+    }
+
+    @PutMapping("/{applicationId}/contact/unlink/{contactId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApplicationResponse> removeContactFromApp(@PathVariable Integer applicationId ,@PathVariable Integer contactId) {
+        ApplicationResponse updatedApplication = applicationService.removeContactFromApp(applicationId,contactId);
+        return ResponseEntity.ok(updatedApplication);
+    }
+
+
 
 
 
@@ -97,6 +118,12 @@ public class ApplicationController {
     public List<Server> getNonArchivedApplicationServers(@PathVariable Integer appId) {
         return applicationService.getNonArchivedApplicationServers(appId);
     }
+
+    @GetMapping("/{appId}/contacts")
+    public List<Contact> getNonArchivedApplicationContacts(@PathVariable Integer appId) {
+        return applicationService.getNonArchivedApplicationContacts(appId);
+    }
+
     @GetMapping("/non-archived")
     public ResponseEntity<List<ApplicationResponse>> getAllNonArchivedApplications(
             @RequestParam(defaultValue = "5", required = false)

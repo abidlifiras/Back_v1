@@ -25,20 +25,21 @@ public class ContactService {
     private final ContactRepository contactRepository;
 
 
-    public void createContact(ContactRequest contactRequest) {
-        LocalDateTime created = LocalDateTime.now() ;
+    public ContactResponse createContact(ContactRequest contactRequest) {
+
         Contact contact = Contact.builder()
                 .fullName(contactRequest.getFullName())
                 .title(contactRequest.getTitle())
-                .createdAt(created)
+                .createdAt(LocalDateTime.now())
                 .department(contactRequest.getDepartment())
                 .email(contactRequest.getEmail())
                 .build();
         contactRepository.save(contact);
         log.info("Contact {} created successfully", contact.getId());
+        return mapToContactResponse(contact);
     }
 
-    public ContactResponse addAppToContact(Integer contactId, Integer applicationId) {
+    public ContactResponse addAppToContact(Integer contactId, Integer applicationId,ContactRequest contactRequest) {
         Optional<Contact> optionalContact= contactRepository.findById(contactId);
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
@@ -49,14 +50,39 @@ public class ContactService {
             List<Application> applications = contact.getApplications();
             if (!applications.contains(application)) {
                 applications.add(application);
-                application.addContact(contact);
+                application.getContacts().add(contact);
                 contact.setApplications(applications);
+                contact.setFullName(contactRequest.getFullName());
+                contact.setTitle(contactRequest.getTitle());
+                contact.setDepartment(contactRequest.getDepartment());
+                contact.setEmail(contactRequest.getEmail());
+                contact.setModifiedAt(LocalDateTime.now());
 
                 Contact updatedContact = contactRepository.save(contact);
                 return mapToContactResponse(updatedContact);
             } else {
                 return mapToContactResponse(contact);
             }
+        } else {
+            throw new NotFoundCustomException("Contact not found with id: " + contactId);
+        }
+    }
+
+
+    public List<Application> getNonArchivedContactApplications(Integer contactId) {
+        Optional<Contact> optionalContact = contactRepository.findById(contactId);
+        if (optionalContact.isPresent()) {
+            Contact contact = optionalContact.get();
+            List<Application> applications = new ArrayList<>();
+            for (Application application : contact.getApplications()) {
+                for (Contact appContact : application.getContacts()) {
+                    if (appContact.getId().equals(contact.getId()) && application.getDeletedAt()==null) {
+                        applications.add(application);
+                        break;
+                    }
+                }
+            }
+            return applications;
         } else {
             throw new NotFoundCustomException("Contact not found with id: " + contactId);
         }
@@ -112,7 +138,7 @@ public class ContactService {
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
             for (Application application : contact.getApplications()) {
-                application.getServers().remove(contact);
+                application.getContacts().remove(contact);
             }
             contactRepository.delete(optionalContact.get());
         } else {
