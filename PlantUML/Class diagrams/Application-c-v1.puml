@@ -1,0 +1,9 @@
+@startuml
+
+class Application {
+   -id : Integer
+   -appName : String
+   -appDescription : String
+   -isArchived : Boolean
+}
+@enduml

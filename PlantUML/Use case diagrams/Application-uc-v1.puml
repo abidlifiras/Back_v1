@@ -1,0 +1,17 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor Architect
+
+rectangle "Applications Portfolio" {
+  Architect -- (Load data from excel)
+  Architect -- (Create new application)
+  Architect -- (Browse applications)
+  Architect -- (Edit applications)
+  Architect -- (Delete applications)
+  (Delete applications) ..> (Browse applications) : includes
+  (Edit applications) ..> (Browse applications) : includes
+  (View applications) <|.. (Browse applications) : extends
+  (Search applications) <|.. (Browse applications) : extends
+}
+@enduml

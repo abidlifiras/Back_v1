@@ -1,0 +1,26 @@
+@startuml
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class application_server {
+   application_id: int(11)
+   server_id: int(11)
+}
+class applications {
+   app_description: varchar(255)
+   app_name: varchar(255)
+   is_archived: bit(1)
+   id: int(11)
+}
+class servers {
+   ip: varchar(255)
+   os: varchar(255)
+   os_version: varchar(255)
+   server_name: varchar(255)
+   id: int(11)
+}
+
+application_server  -[#595959,plain]-^  applications       : "application_id:id"
+application_server  -[#595959,plain]-^  servers            : "server_id:id"
+@enduml
