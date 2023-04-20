@@ -17,7 +17,7 @@ public class OperatingSystemController {
     private OperatingSystemService operatingSystemService ;
 
     @PostMapping
-    public ResponseEntity<OperatingSystem> createServer(@RequestBody OperatingSystem Os) {
+    public ResponseEntity<OperatingSystem> createOs(@RequestBody OperatingSystem Os) {
         OperatingSystem newOs = operatingSystemService.createOs(Os);
         return new ResponseEntity<>(newOs, HttpStatus.CREATED);
     }

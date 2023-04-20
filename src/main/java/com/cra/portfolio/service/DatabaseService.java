@@ -1,4 +1,5 @@
 package com.cra.portfolio.service;
+import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.dto.DatabaseRequest;
 import com.cra.portfolio.dto.DatabaseResponse;
 import com.cra.portfolio.dto.ServerResponse;
@@ -32,6 +33,7 @@ public class DatabaseService {
         Database database = Database.builder()
                 .databaseName(databaseRequest.getNameDb())
                 .databaseVersion(databaseRequest.getVersionDb())
+                .createdAt(LocalDateTime.now())
                 .build();
         databaseRepository.save(database);
         log.info("database {} created successfully", database.getDatabaseId());
@@ -170,6 +172,27 @@ public class DatabaseService {
         return databaseResponses;
 
     }
+    public List<DatabaseResponse> getAllDB() {
+
+        Iterable<Database> databases = databaseRepository.findAllByDeletedAtNull();
+
+        List<DatabaseResponse> databaseResponses = new ArrayList<>();
+
+
+        databases.forEach( database ->
+                databaseResponses.add(DatabaseResponse
+                        .builder()
+                        .id(database.getDatabaseId())
+                        .nameDb(database.getDatabaseName())
+                        .versionDb(database.getDatabaseVersion())
+                        .serverList(database.getServerList())
+                        .createdAt(database.getCreatedAt())
+                        .modifiedAt(database.getModifiedAt())
+                        .deletedAt(database.getDeletedAt())
+                        .build())
+        );
+
+        return databaseResponses;}
 
     public void deleteDatabaseById(Integer id) {
         Optional<Database> optionalDatabase = databaseRepository.findById(id);
@@ -214,16 +237,21 @@ public class DatabaseService {
     }
 
     public DatabaseResponse findById(Integer id) {
-        Optional<Database> database = databaseRepository.findById(id);
+        Optional<Database> Db = databaseRepository.findById(id);
 
-        if (database.isPresent()) {
-            Database database1 = database.get();
+        if (Db.isPresent()) {
+            Database database = Db.get();
+            if (database.getDeletedAt()!=null) {
+                throw new NotFoundCustomException("Database not found with id: " + id);
+            }
             return DatabaseResponse
                     .builder()
-                    .id(database1.getDatabaseId())
-                    .nameDb(database1.getDatabaseName())
-                    .versionDb(database1.getDatabaseVersion())
-                    .serverList(database1.getServerList())
+                    .id(database.getDatabaseId())
+                    .versionDb(database.getDatabaseVersion())
+                    .nameDb(database.getDatabaseName())
+                    .modifiedAt(database.getModifiedAt())
+                    .deletedAt(database.getDeletedAt())
+                    .createdAt(database.getCreatedAt())
                     .build();
 
 

@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ContactRepository extends JpaRepository<Contact, Integer> {
     List<Contact> findAllByDeletedAtNull(Pageable paging);
+    List<Contact> findAllByDeletedAtNull();
+
 
     List<Contact> findAllByDeletedAtIsNotNull(Pageable paging) ;
 }

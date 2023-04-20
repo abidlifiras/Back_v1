@@ -195,6 +195,31 @@ public class ContactService {
                         .fullName(contact.getFullName())
                         .department(contact.getDepartment())
                         .title(contact.getTitle())
+                                .email(contact.getEmail())
+                        .applications(contact.getApplications())
+                        .modifiedAt(contact.getModifiedAt())
+                        .deletedAt(contact.getDeletedAt())
+                        .createdAt(contact.getCreatedAt())
+                        .build())
+        );
+
+        return contactResponses;
+    }
+    public List<ContactResponse> getAllContact() {
+
+        Iterable<Contact> contacts = contactRepository.findAllByDeletedAtNull();
+
+        List<ContactResponse> contactResponses = new ArrayList<>();
+
+        contacts.forEach( contact ->
+                contactResponses.add(ContactResponse
+                        .builder()
+                        .applications(contact.getApplications())
+                        .id(contact.getId())
+                        .fullName(contact.getFullName())
+                        .department(contact.getDepartment())
+                        .title(contact.getTitle())
+                        .email(contact.getEmail())
                         .applications(contact.getApplications())
                         .modifiedAt(contact.getModifiedAt())
                         .deletedAt(contact.getDeletedAt())
@@ -218,6 +243,7 @@ public class ContactService {
                         .fullName(contact.getFullName())
                         .department(contact.getDepartment())
                         .title(contact.getTitle())
+                                .email(contact.getEmail())
                         .applications(contact.getApplications())
                         .modifiedAt(contact.getModifiedAt())
                         .deletedAt(contact.getDeletedAt())
@@ -244,6 +270,7 @@ public class ContactService {
                     .department(cont.getDepartment())
                     .title(cont.getTitle())
                     .applications(cont.getApplications())
+                    .email(cont.getEmail())
                     .modifiedAt(cont.getModifiedAt())
                     .deletedAt(cont.getDeletedAt())
                     .createdAt(cont.getCreatedAt())

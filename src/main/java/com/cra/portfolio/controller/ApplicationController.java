@@ -118,6 +118,10 @@ public class ApplicationController {
     public List<Server> getNonArchivedApplicationServers(@PathVariable Integer appId) {
         return applicationService.getNonArchivedApplicationServers(appId);
     }
+    @GetMapping("/all")
+    public List<ApplicationResponse> getNonArchivedApplication() {
+        return applicationService.getApplicationAll();
+    }
 
     @GetMapping("/{appId}/contacts")
     public List<Contact> getNonArchivedApplicationContacts(@PathVariable Integer appId) {

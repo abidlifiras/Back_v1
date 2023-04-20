@@ -1,11 +1,8 @@
 package com.cra.portfolio.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,6 +26,9 @@ public class Application {
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
+    @ManyToOne
+    @JoinColumn(name = "assessment_id")
+    private Assessment assessment;
     @ManyToMany(mappedBy = "applications", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Server> servers = new ArrayList<>();

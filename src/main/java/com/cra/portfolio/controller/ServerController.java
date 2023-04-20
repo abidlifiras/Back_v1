@@ -35,7 +35,7 @@ public class ServerController {
 
     @GetMapping()
     public ResponseEntity<List<ServerResponse>> getAllServers(
-            @RequestParam(defaultValue = "10", required = false)
+            @RequestParam(defaultValue = "20", required = false)
             Integer pageSize,
             @RequestParam(defaultValue = "0", required = false)
             Integer page
@@ -151,6 +151,10 @@ public class ServerController {
     public List<ServerResponse> findServerByName(@PathVariable String serverName) {
         return serverService.findByServerName(serverName);
 
+    }
+    @GetMapping("/all")
+    public List<ServerResponse> getNonArchivedServer() {
+        return serverService.getServerAll();
     }
 
 

@@ -11,5 +11,7 @@ public interface DatabaseRepository extends JpaRepository<Database, Integer> {
     List<Database> findAllByDeletedAtNull(Pageable paging);
 
     List<Database> findAllByDeletedAtIsNotNull(Pageable paging) ;
+
+    Iterable<Database> findAllByDeletedAtNull();
 }
 

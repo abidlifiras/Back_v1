@@ -422,4 +422,35 @@ public class ServerService {
     }
 
 
+    public List<ServerResponse> getServerAll() {
+
+        Iterable<Server> servers = serverRepository.findAllByDeletedAtIsNull();
+
+        List<ServerResponse> serverResponses = new ArrayList<>();
+
+        servers.forEach( server ->
+                serverResponses.add(ServerResponse
+                        .builder()
+                        .id(server.getId())
+                        .serverName(server.getServerName())
+                        .dataSource(server.getDataSource())
+                        .type(server.getType())
+                        .role(server.getRole())
+                        .currentNumberOfCores(server.getCurrentNumberOfCores())
+                        .currentRamGb(server.getCurrentRamGb())
+                        .currentDiskGb(server.getCurrentDiskGb())
+                        .powerStatus(server.getPowerStatus())
+                        .serverNotes(server.getServerNotes())
+                        .ipAddress(server.getIpAddress())
+                        .operatingSystem(server.getOperatingSystem())
+                        .applications(server.getApplications())
+                        .databaseList(server.getDatabaseList())
+                        .modifiedAt(server.getModifiedAt())
+                        .deletedAt(server.getDeletedAt())
+                        .createdAt(server.getCreatedAt())
+                        .build())
+        );
+
+        return serverResponses;
+    }
 }

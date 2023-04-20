@@ -14,4 +14,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Intege
     List<Application> findAllByDeletedAtNull(Pageable paging);
 
     List<Application> findAllByDeletedAtIsNotNull(Pageable paging) ;
+
+    Iterable<Application> findAllByDeletedAtNull();
 }

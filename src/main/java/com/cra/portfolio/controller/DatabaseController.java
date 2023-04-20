@@ -82,6 +82,11 @@ public class DatabaseController {
     public List<Server> getNonArchivedDatabaseServers(@PathVariable Integer databaseId) {
         return databaseService.getNonArchivedDatabaseServers(databaseId);
     }
+    @GetMapping("/all")
+    public List<DatabaseResponse> getAllDB() {
+        return databaseService.getAllDB();
+    }
+
     @GetMapping("/non-archived")
     public ResponseEntity<List<DatabaseResponse>> getAllNonArchivedDatabase(
             @RequestParam(defaultValue = "5", required = false)

@@ -443,7 +443,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
         if (app.isPresent()) {
             Application application = app.get();
-            if (application.getDeletedAt()==null) {
+            if (application.getDeletedAt()!=null) {
                 throw new NotFoundCustomException("Application not found with id: " + id);
             }
             return ApplicationResponse
@@ -464,5 +464,27 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
             throw new NotFoundCustomException("Application not found with id: " + id);
         }
 
+    }
+
+    public List<ApplicationResponse> getApplicationAll() {
+        Iterable<Application> apps = applicationRepository.findAllByDeletedAtNull();
+
+        List<ApplicationResponse> applicationResponses = new ArrayList<>();
+
+        apps.forEach( application ->
+                applicationResponses.add(ApplicationResponse
+                        .builder()
+                        .id(application.getId())
+                        .appName(application.getAppName())
+                        .appDescription(application.getAppDescription())
+                        .servers(application.getServers())
+                        .contacts(application.getContacts())
+                        .createdAt(application.getCreatedAt())
+                        .deletedAt(application.getDeletedAt())
+                        .modifiedAt(application.getModifiedAt())
+                        .build())
+        );
+
+        return applicationResponses;
     }
 }

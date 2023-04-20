@@ -67,6 +67,10 @@ public class ContactController {
     public List<Application> getNonArchivedContactApplications(@PathVariable Integer contactId) {
         return contactService.getNonArchivedContactApplications(contactId);
     }
+    @GetMapping("/all")
+    public List<ContactResponse> getNonCn() {
+        return contactService.getAllContact();
+    }
 
     @GetMapping("/archived")
     public ResponseEntity<List<ContactResponse>> getAllArchivedContacts(
