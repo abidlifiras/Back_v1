@@ -38,4 +38,11 @@ public class CategoryService {
         return category1.getQuestions();
 
     }
+
+    public Optional<Category> getCategoryById(Integer CategoryId){
+        return categoryRepository.findById(CategoryId);
+    }
+    public List<Category> getAllCategories(){
+        return categoryRepository.findAll();
+    }
 }

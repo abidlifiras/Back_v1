@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -22,9 +23,19 @@ public class CategoryController {
         Category newCategory = categoryService.createCategory(category);
         return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
     }
-    @GetMapping("/{CategoryId}")
+    @GetMapping("/{CategoryId}/questions")
     public List<Question> GetAllCategoryQuestions(@PathVariable Integer CategoryId) {
         return categoryService.getAllCategoryQuestions(CategoryId);
+
+    }
+    @GetMapping("/{CategoryId}")
+    public Optional<Category> GetCategoryById(@PathVariable Integer CategoryId) {
+        return categoryService.getCategoryById(CategoryId);
+
+    }
+    @GetMapping()
+    public List<Category> GetAllCategories() {
+        return categoryService.getAllCategories();
 
     }
 }
