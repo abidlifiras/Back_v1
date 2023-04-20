@@ -1,0 +1,29 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class applications {
+   app_description: varchar(255)
+   app_name: varchar(255)
+   is_archived: bit(1)
+   created_at: datetime
+   deleted_at: datetime
+   modified_at: datetime
+   id: int(11)
+}
+class applications_interface {
+   data_format: varchar(255)
+   flow: smallint(6)
+   frequency: smallint(6)
+   notes: varchar(255)
+   processing_mode: smallint(6)
+   protocol: varchar(255)
+   application_src_id: int(11)
+   application_target_id: int(11)
+}
+
+applications_interface  -[#595959,plain]-^  applications           : "application_target_id:id"
+applications_interface  -[#595959,plain]-^  applications           : "application_src_id:id"
+@enduml
