@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +20,12 @@ public class AssessmentService {
     @Autowired
     private CategoryService categoryService ;
 
-    public Assessment createAssessment(Assessment assessment){
-        assessment.setCreatedAt(LocalDateTime.now());
-        for (Category category : assessment.getCategories()){
-            category.setAssessment(assessment);
-            Category category1 = categoryService.createCategory(category);
-        }
-        return assessmentRepository.save(assessment);
+
+
+    public List<Assessment> getAllAssessments(){
+        return assessmentRepository.findAll();
     }
+
 
 
 

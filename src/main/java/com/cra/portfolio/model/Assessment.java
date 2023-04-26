@@ -18,13 +18,16 @@ public class Assessment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    private String assessment ;
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
     @OneToMany(mappedBy="assessment")
     private List<Application> applications ;
-    @OneToMany(mappedBy="assessment")
-    private List<Category> categories ;
     private String note ;
+
+    @OneToMany(mappedBy="assessment")
+    private List<Step> steps ;
+    private Integer step ;
 
 }

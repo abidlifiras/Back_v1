@@ -20,4 +20,8 @@ public class QuestionController {
         Question newQuestion = questionService.createQuestion(question);
         return new ResponseEntity<>(newQuestion, HttpStatus.CREATED);
     }
+    @PostMapping("/{questionId}")
+    public void editResponse( @PathVariable Integer questionId , @RequestBody String response){
+        questionService.editQuestion(questionId,response);
+    }
 }

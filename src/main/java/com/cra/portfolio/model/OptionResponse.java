@@ -22,7 +22,4 @@ public class OptionResponse {
     private LocalDateTime deletedAt = null;
     private LocalDateTime modifiedAt = null;
     private LocalDateTime createdAt = null;
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "option_id")
-    private Option option;
 }

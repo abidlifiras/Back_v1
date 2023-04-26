@@ -28,8 +28,6 @@ public class Option {
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
-    @OneToOne(mappedBy = "option")
-    private OptionResponse response;
     @JsonIgnore
 
     @ManyToOne(cascade = CascadeType.PERSIST)

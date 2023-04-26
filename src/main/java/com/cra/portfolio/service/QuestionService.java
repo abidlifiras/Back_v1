@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,5 +27,12 @@ public class QuestionService {
             option.setQuestion(question);
             optionService.createOption(option); }
         return  questionRepository.save(question);
+    }
+
+    public void editQuestion(Integer questionId , String response){
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId) ;
+        Question question=optionalQuestion.get();
+        question.setResponse(response);
+        questionRepository.save(question);
     }
 }

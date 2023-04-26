@@ -6,33 +6,28 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-@Entity
-@Table(name = "Categories")
+
+@Table(name = "Steps")
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Entity
 @Builder
-public class Category {
+public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String category ;
-
-    private LocalDateTime createdAt = null ;
-
+    private String step ;
+    @OneToMany(mappedBy="step",cascade = CascadeType.ALL)
+    private List<Category> categories ;
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
-
-
-    @OneToMany(mappedBy="category",cascade = CascadeType.ALL)
-    private List<Question> questions;
+    private LocalDateTime createdAt = null ;
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "step_id")
-    private Step step;
-
+    @JoinColumn(name = "assessment_id")
+    private Assessment assessment;
 }
