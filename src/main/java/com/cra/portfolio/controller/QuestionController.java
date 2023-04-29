@@ -27,11 +27,12 @@ public class QuestionController {
         return new ResponseEntity<>(newQuestion, HttpStatus.CREATED);
     }
     @PutMapping("/{questionId}")
-    public void editResponse( @PathVariable Integer questionId , @RequestBody String response1) throws JsonProcessingException {
+    public String editResponse( @PathVariable Integer questionId , @RequestBody String response1) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> jsonMap = objectMapper.readValue(response1, new TypeReference<Map<String,Object>>(){});
 
         String responseValue = (String) jsonMap.get("response");
         questionService.editQuestion(questionId,responseValue);
+        return responseValue ;
     }
 }

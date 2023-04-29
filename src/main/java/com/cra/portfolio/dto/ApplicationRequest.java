@@ -1,5 +1,6 @@
 package com.cra.portfolio.dto;
 
+import com.cra.portfolio.model.Assessment;
 import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Server;
 import lombok.AllArgsConstructor;
@@ -23,5 +24,6 @@ public class ApplicationRequest {
     private List<Server> servers ;
 
     private List<Contact> contacts ;
+    private Assessment assessment ;
 
 }

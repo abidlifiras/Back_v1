@@ -3,14 +3,15 @@ package com.cra.portfolio.service;
 import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.exception.NotFoundCustomException;
-import com.cra.portfolio.model.Application;
-import com.cra.portfolio.model.Contact;
-import com.cra.portfolio.model.Server;
+import com.cra.portfolio.model.*;
 import com.cra.portfolio.repository.ApplicationRepository;
+import com.cra.portfolio.repository.AssessmentRepository;
 import com.cra.portfolio.repository.ContactRepository;
 import com.cra.portfolio.repository.ServerRepository;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,10 @@ public class ApplicationService {
     private final ServerRepository serverRepository;
 
     private final ContactRepository contactRepository;
+    private final AssessmentRepository assessmentRepository;
+
+    @Autowired
+    private AssessmentResponseService assessmentResponseService ;
 
 
     //add server object to application
@@ -40,6 +45,7 @@ public class ApplicationService {
                 .appName(applicationRequest.getAppName())
                 .appDescription(applicationRequest.getAppDescription())
                 .createdAt(created)
+                .assessment(applicationRequest.getAssessment())
                 .build();
         applicationRepository.save(application);
         log.info("application {} created successfully", application.getId());
@@ -275,6 +281,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                             .modifiedAt(application.getModifiedAt())
                             .deletedAt(application.getDeletedAt())
                             .createdAt(application.getCreatedAt())
+                            .assessment(application.getAssessment())
                     .build())
     );
 
@@ -329,6 +336,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                 .createdAt(application.getCreatedAt())
                 .deletedAt(application.getDeletedAt())
                 .modifiedAt(application.getModifiedAt())
+                .assessment(application.getAssessment())
                 .build();
     }
 
@@ -436,6 +444,16 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
             throw new NotFoundCustomException("Application not found with name: " + appName);
         }
     }
+    public void GetAssessmentApplicationResponse(Integer applicationId){
+        Optional<Application> applicationOptional =applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()){
+            Application application=applicationOptional.get();
+            List<Question> questions =application.getAssessment().getSteps().
+            for(Question question : )
+
+    } else {
+            throw new NotFoundCustomException("Application not found with id: " + applicationId);
+        }}
 
 //and not archived
     public ApplicationResponse findById(Integer id) {
@@ -456,6 +474,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                     .modifiedAt(application.getModifiedAt())
                     .deletedAt(application.getDeletedAt())
                     .createdAt(application.getCreatedAt())
+                    .assessment(application.getAssessment())
                     .build();
 
 
@@ -486,5 +505,14 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         );
 
         return applicationResponses;
+    }
+
+    public void AddAssessmentToApplication(Integer appId , Integer assessmentId){
+        Optional<Application> applicationOptional = applicationRepository.findById(appId);
+        Optional<Assessment> assessmentOptional=assessmentRepository.findById(assessmentId);
+        Application application=applicationOptional.get();
+        Assessment assessment=assessmentOptional.get();
+        application.setAssessment(assessment);
+        applicationRepository.save(application);
     }
 }

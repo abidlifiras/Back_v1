@@ -176,7 +176,10 @@ public class ApplicationController {
         return applicationService.findByAppName(appName);
 
     }
-
+    @PostMapping("/{applicationId}/addAssessment/{assessmentId}")
+    public void AddAssessmentToApplication(@PathVariable Integer applicationId , @PathVariable Integer assessmentId){
+        applicationService.AddAssessmentToApplication(applicationId,assessmentId);
+    }
 
 
 

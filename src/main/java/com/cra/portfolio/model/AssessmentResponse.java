@@ -1,6 +1,5 @@
 package com.cra.portfolio.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,16 +8,23 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "OptionResponse")
+@Table(name = "AssessmentResponse")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptionResponse {
+public class AssessmentResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String answer;
+    private String response;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "application_id")
+    private Application application;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "question_id")
+    private Question question;
     private LocalDateTime deletedAt = null;
     private LocalDateTime modifiedAt = null;
     private LocalDateTime createdAt = null;

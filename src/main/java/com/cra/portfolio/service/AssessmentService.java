@@ -26,6 +26,11 @@ public class AssessmentService {
         return assessmentRepository.findAll();
     }
 
+    public void createAssessment(Assessment assessment){
+        assessment.setCreatedAt(LocalDateTime.now());
+        assessmentRepository.save(assessment);
+    }
+
 
 
 

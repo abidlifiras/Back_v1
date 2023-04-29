@@ -26,9 +26,13 @@ public class Application {
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "assessment_id")
     private Assessment assessment;
+
+    @OneToOne(mappedBy = "application")
+    private AssessmentResponse assessmentResponse;
     @ManyToMany(mappedBy = "applications", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Server> servers = new ArrayList<>();

@@ -22,12 +22,11 @@ public class Assessment {
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
-    @OneToMany(mappedBy="assessment")
+    @OneToMany(mappedBy="assessment",cascade = CascadeType.ALL)
     private List<Application> applications ;
     private String note ;
 
     @OneToMany(mappedBy="assessment")
     private List<Step> steps ;
-    private Integer step ;
 
 }
