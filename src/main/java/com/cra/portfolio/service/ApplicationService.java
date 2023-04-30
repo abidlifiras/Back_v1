@@ -452,21 +452,15 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         }}*/
 
 //and not archived
-public Assessment getApplicationAssessment(Integer applicationId) {
+public Optional<Assessment> getApplicationAssessment(Integer applicationId) {
     Application application = applicationRepository.findById(applicationId)
             .orElseThrow(() -> new EntityNotFoundException("Application with id " + applicationId + " not found"));
-
+    if (application.getAssessment()==null){
+        return Optional.empty();
+    }
     Assessment assessment = assessmentRepository.findById(application.getAssessment().getId())
             .orElseThrow(() -> new EntityNotFoundException("Assessment with id " + application.getAssessment().getId() + " not found"));
 
-    Map<Question, AssessmentResponse> responses = new HashMap<>();
-
-    // Collect existing responses for each question
-    for (AssessmentResponse response : assessmentResponseRepository.findByAppId(applicationId)) {
-        responses.put(response.getQuestion(), response);
-    }
-
-    // Update response for each question in each category
     for (Step step : assessment.getSteps()) {
         List<Category> categories = step.getCategories();
 
@@ -474,28 +468,19 @@ public Assessment getApplicationAssessment(Integer applicationId) {
             List<Question> questions = category.getQuestions();
 
             for (Question question : questions) {
-                AssessmentResponse response = responses.get(question);
+                AssessmentResponse response = assessmentResponseRepository.findByAppIdAndAndQuestion(applicationId, question);
+                if (response == null){
+                    question.setResponse("");
 
-                if (response == null) {
-                    // No existing response, create a new one
-                    response = new AssessmentResponse();
-                    response.setAppId(applicationId);
-                    response.setQuestion(question);
-                    responses.put(question, response);
                 }
-
-                // Update response value
-                response.setResponse(question.getResponse());
+                else {
+                    question.setResponse(response.getResponse());
+                }
             }
         }
     }
-
-    // Save updated responses
-    assessmentResponseRepository.saveAll(responses.values());
-
-    return assessment;
+    return Optional.of(assessment);
 }
-
     public ApplicationResponse findById(Integer id) {
         Optional<Application> app = applicationRepository.findById(id);
 

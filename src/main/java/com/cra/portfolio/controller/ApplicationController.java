@@ -2,8 +2,6 @@ package com.cra.portfolio.controller;
 
 import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
-import com.cra.portfolio.dto.ContactResponse;
-import com.cra.portfolio.model.Application;
 import com.cra.portfolio.model.Assessment;
 import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Server;
@@ -13,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/applications")
@@ -182,7 +180,7 @@ public class ApplicationController {
         applicationService.AddAssessmentToApplication(applicationId,assessmentId);
     }
     @GetMapping("/{applicationId}/assessment")
-    public Assessment getApplicationAssessment(@PathVariable Integer applicationId){
+    public Optional<Assessment> getApplicationAssessment(@PathVariable Integer applicationId){
         return applicationService.getApplicationAssessment(applicationId);
     }
 
