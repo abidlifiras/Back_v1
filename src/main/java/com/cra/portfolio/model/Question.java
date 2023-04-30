@@ -36,6 +36,8 @@ public class Question {
     private List<Option> options;
 
     private String response ;
+    @JsonIgnore
+
     @OneToOne(mappedBy = "question")
     private AssessmentResponse assessmentResponse;
 

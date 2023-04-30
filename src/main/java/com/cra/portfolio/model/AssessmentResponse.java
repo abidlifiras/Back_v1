@@ -18,9 +18,8 @@ public class AssessmentResponse {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String response;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "application_id")
-    private Application application;
+
+    private Integer appId;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_id")

@@ -3,7 +3,10 @@ package com.cra.portfolio.service;
 import com.cra.portfolio.model.Application;
 import com.cra.portfolio.model.AssessmentResponse;
 import com.cra.portfolio.model.Question;
+import com.cra.portfolio.repository.ApplicationRepository;
 import com.cra.portfolio.repository.AssessmentResponseRepository;
+import com.cra.portfolio.repository.QuestionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +19,32 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class AssessmentResponseService {
+
+    private final ApplicationRepository applicationRepository;
+    private final QuestionRepository questionRepository ;
     @Autowired
     private AssessmentResponseRepository assessmentResponseRepository;
 
-    public AssessmentResponse saveAssessmentResponse(AssessmentResponse assessmentResponse) {
-        LocalDateTime now = LocalDateTime.now();
-        assessmentResponse.setCreatedAt(now);
-        assessmentResponse.setModifiedAt(now);
-        return assessmentResponseRepository.save(assessmentResponse);
+
+    public void createAssessmentResponse(Integer appId, Integer questionId, String response) {
+        Question question = questionRepository.findById(questionId).orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
+        AssessmentResponse existingResponse = assessmentResponseRepository.findByAppIdAndAndQuestion(appId, question);
+
+        if (existingResponse == null) {
+            AssessmentResponse newResponse = new AssessmentResponse();
+            newResponse.setQuestion(question);
+            newResponse.setResponse(response);
+            newResponse.setCreatedAt(LocalDateTime.now());
+            newResponse.setModifiedAt(LocalDateTime.now());
+            newResponse.setAppId(appId);
+            assessmentResponseRepository.save(newResponse);
+        } else {
+            existingResponse.setResponse(response);
+            existingResponse.setModifiedAt(LocalDateTime.now());
+            assessmentResponseRepository.save(existingResponse);
+        }
     }
+
 
     public List<AssessmentResponse> getAllAssessmentResponses() {
         return assessmentResponseRepository.findAll();
@@ -35,7 +55,7 @@ public class AssessmentResponseService {
     }
 
     public AssessmentResponse getAssessmentResponseByApplicationAndQuestion(Application application, Question question) {
-        return assessmentResponseRepository.findByApplicationAndQuestion(application, question);
+        return assessmentResponseRepository.findByAppIdAndAndQuestion(application.getId(), question);
     }
 
     public void deleteAssessmentResponse(Integer id) {

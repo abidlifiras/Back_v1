@@ -4,6 +4,7 @@ import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.dto.ContactResponse;
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.Assessment;
 import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.ApplicationService;
@@ -180,7 +181,9 @@ public class ApplicationController {
     public void AddAssessmentToApplication(@PathVariable Integer applicationId , @PathVariable Integer assessmentId){
         applicationService.AddAssessmentToApplication(applicationId,assessmentId);
     }
-
-
+    @GetMapping("/{applicationId}/assessment")
+    public Assessment getApplicationAssessment(@PathVariable Integer applicationId){
+        return applicationService.getApplicationAssessment(applicationId);
+    }
 
 }

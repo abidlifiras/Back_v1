@@ -4,11 +4,9 @@ import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.exception.NotFoundCustomException;
 import com.cra.portfolio.model.*;
-import com.cra.portfolio.repository.ApplicationRepository;
-import com.cra.portfolio.repository.AssessmentRepository;
-import com.cra.portfolio.repository.ContactRepository;
-import com.cra.portfolio.repository.ServerRepository;
+import com.cra.portfolio.repository.*;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +31,8 @@ public class ApplicationService {
     private final ContactRepository contactRepository;
     private final AssessmentRepository assessmentRepository;
 
-    @Autowired
-    private AssessmentResponseService assessmentResponseService ;
+    private final AssessmentResponseRepository assessmentResponseRepository;
+
 
 
     //add server object to application
@@ -281,7 +279,6 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                             .modifiedAt(application.getModifiedAt())
                             .deletedAt(application.getDeletedAt())
                             .createdAt(application.getCreatedAt())
-                            .assessment(application.getAssessment())
                     .build())
     );
 
@@ -336,7 +333,6 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                 .createdAt(application.getCreatedAt())
                 .deletedAt(application.getDeletedAt())
                 .modifiedAt(application.getModifiedAt())
-                .assessment(application.getAssessment())
                 .build();
     }
 
@@ -443,7 +439,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         } else {
             throw new NotFoundCustomException("Application not found with name: " + appName);
         }
-    }
+    }/*
     public void GetAssessmentApplicationResponse(Integer applicationId){
         Optional<Application> applicationOptional =applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()){
@@ -453,9 +449,53 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
     } else {
             throw new NotFoundCustomException("Application not found with id: " + applicationId);
-        }}
+        }}*/
 
 //and not archived
+public Assessment getApplicationAssessment(Integer applicationId) {
+    Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new EntityNotFoundException("Application with id " + applicationId + " not found"));
+
+    Assessment assessment = assessmentRepository.findById(application.getAssessment().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Assessment with id " + application.getAssessment().getId() + " not found"));
+
+    Map<Question, AssessmentResponse> responses = new HashMap<>();
+
+    // Collect existing responses for each question
+    for (AssessmentResponse response : assessmentResponseRepository.findByAppId(applicationId)) {
+        responses.put(response.getQuestion(), response);
+    }
+
+    // Update response for each question in each category
+    for (Step step : assessment.getSteps()) {
+        List<Category> categories = step.getCategories();
+
+        for (Category category : categories) {
+            List<Question> questions = category.getQuestions();
+
+            for (Question question : questions) {
+                AssessmentResponse response = responses.get(question);
+
+                if (response == null) {
+                    // No existing response, create a new one
+                    response = new AssessmentResponse();
+                    response.setAppId(applicationId);
+                    response.setQuestion(question);
+                    responses.put(question, response);
+                }
+
+                // Update response value
+                response.setResponse(question.getResponse());
+            }
+        }
+    }
+
+    // Save updated responses
+    assessmentResponseRepository.saveAll(responses.values());
+
+    return assessment;
+}
+
     public ApplicationResponse findById(Integer id) {
         Optional<Application> app = applicationRepository.findById(id);
 
@@ -474,7 +514,6 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
                     .modifiedAt(application.getModifiedAt())
                     .deletedAt(application.getDeletedAt())
                     .createdAt(application.getCreatedAt())
-                    .assessment(application.getAssessment())
                     .build();
 
 

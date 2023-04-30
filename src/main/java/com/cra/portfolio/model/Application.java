@@ -31,8 +31,6 @@ public class Application {
     @JoinColumn(name = "assessment_id")
     private Assessment assessment;
 
-    @OneToOne(mappedBy = "application")
-    private AssessmentResponse assessmentResponse;
     @ManyToMany(mappedBy = "applications", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Server> servers = new ArrayList<>();

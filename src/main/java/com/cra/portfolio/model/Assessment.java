@@ -1,5 +1,6 @@
 package com.cra.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,8 @@ public class Assessment {
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;
     private LocalDateTime createdAt = null ;
+    @JsonIgnore
+
     @OneToMany(mappedBy="assessment",cascade = CascadeType.ALL)
     private List<Application> applications ;
     private String note ;

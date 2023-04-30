@@ -30,6 +30,4 @@ public class ApplicationResponse {
     private LocalDateTime modifiedAt ;
     private List<Server> servers;
     private List<Contact> contacts ;
-    private Assessment assessment ;
-
 }

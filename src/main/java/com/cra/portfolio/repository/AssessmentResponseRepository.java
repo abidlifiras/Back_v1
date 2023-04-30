@@ -5,7 +5,9 @@ import com.cra.portfolio.model.AssessmentResponse;
 import com.cra.portfolio.model.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AssessmentResponseRepository extends JpaRepository<AssessmentResponse,Integer> {
-    AssessmentResponse findByApplicationAndQuestion(Application application, Question question);
+import java.util.List;
 
+public interface AssessmentResponseRepository extends JpaRepository<AssessmentResponse,Integer> {
+    AssessmentResponse findByAppIdAndAndQuestion(Integer AppId, Question question);
+    List<AssessmentResponse> findByAppId(Integer AppId);
 }
