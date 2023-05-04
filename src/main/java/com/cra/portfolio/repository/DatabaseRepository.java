@@ -10,6 +10,7 @@ import java.util.List;
 public interface DatabaseRepository extends JpaRepository<Database, Integer> {
     List<Database> findAllByDeletedAtNull(Pageable paging);
 
-    List<Database> findAllByDeletedAtIsNotNull(Pageable paging) ;
+
+    List<Database> findAllByDeletedAtIsNotNull(Pageable paging);
 }
 

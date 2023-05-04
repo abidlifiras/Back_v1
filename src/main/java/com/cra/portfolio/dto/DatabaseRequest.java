@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DatabaseRequest {
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private LocalDateTime createdAt = null ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime modifiedAt = null;
+    private LocalDateTime createdAt = null;
     private String nameDb;
     private String versionDb;
-    private List<Server> serverList ;
+    private List<Server> serverList;
 }

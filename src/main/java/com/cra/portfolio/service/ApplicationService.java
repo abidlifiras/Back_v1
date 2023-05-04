@@ -4,15 +4,21 @@ import com.cra.portfolio.dto.ApplicationRequest;
 import com.cra.portfolio.dto.ApplicationResponse;
 import com.cra.portfolio.exception.NotFoundCustomException;
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.ApplicationsInterface;
 import com.cra.portfolio.model.Contact;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.repository.ApplicationRepository;
 import com.cra.portfolio.repository.ContactRepository;
 import com.cra.portfolio.repository.ServerRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +30,7 @@ import java.util.*;
 
 public class ApplicationService {
 
+
     //implement sort
 
     private final ApplicationRepository applicationRepository;
@@ -31,11 +38,14 @@ public class ApplicationService {
 
     private final ContactRepository contactRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     //add server object to application
     //get by name id ... only if not archived !!!
     public ApplicationResponse createApplication(ApplicationRequest applicationRequest) {
-        LocalDateTime created = LocalDateTime.now() ;
+        LocalDateTime created = LocalDateTime.now();
         Application application = Application.builder()
                 .appName(applicationRequest.getAppName())
                 .appDescription(applicationRequest.getAppDescription())
@@ -45,6 +55,30 @@ public class ApplicationService {
         log.info("application {} created successfully", application.getId());
         return mapToApplicationResponse(application);
     }
+
+    public List<ApplicationResponse> getApplicationAll() {
+
+        Iterable<Application> applications = applicationRepository.findAllByDeletedAtIsNull();
+
+        List<ApplicationResponse> applicationResponses = new ArrayList<>();
+
+        applications.forEach( application ->
+                applicationResponses.add(ApplicationResponse
+                        .builder()
+                        .id(application.getId())
+                        .appName(application.getAppName())
+                        .appDescription(application.getAppDescription())
+                                .servers(application.getServers())
+                                .contacts(application.getContacts())
+
+                        .build())
+        );
+
+        return applicationResponses;
+    }
+
+
+
 
 
 
@@ -106,50 +140,50 @@ public class ApplicationService {
            /* for (Server s : serverList) {
                s.getApplications().add(application);
             }*/
-            //serverList=serverRepository.saveAll(serverList);
+    //serverList=serverRepository.saveAll(serverList);
 
-/*
-            application.setAppName(applicationRequest.getAppName());
-            application.setAppDescription(applicationRequest.getAppDescription());
-            application.setServers(serverList);
-            Application updatedApplication = applicationRepository.save(application);
-            return mapToApplicationResponse2(updatedApplication);
-        } else {
-            throw new NotFoundCustomException("Application not found with id: " + applicationId);
-        }
-    }*/
+    /*
+                application.setAppName(applicationRequest.getAppName());
+                application.setAppDescription(applicationRequest.getAppDescription());
+                application.setServers(serverList);
+                Application updatedApplication = applicationRepository.save(application);
+                return mapToApplicationResponse2(updatedApplication);
+            } else {
+                throw new NotFoundCustomException("Application not found with id: " + applicationId);
+            }
+        }*/
     public ApplicationResponse addServerToApp(Integer applicationId, Integer serverId, ApplicationRequest applicationRequest) {
         Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
             Server server = serverRepository.findById(serverId).orElseThrow(() -> new NotFoundCustomException("Server not found with id: " + serverId));
-            if (server.getDeletedAt()!=null){
+            if (server.getDeletedAt() != null) {
                 throw new NotFoundCustomException("Server not found with id : " + serverId);
             }
             List<Server> servers = application.getServers();
             if (!servers.contains(server)) {
                 servers.add(server);
                 server.getApplications().add(application);
-                 application.setServers(servers);
+                application.setServers(servers);
                 application.setAppName(applicationRequest.getAppName());
                 application.setAppDescription(applicationRequest.getAppDescription());
                 application.setModifiedAt(LocalDateTime.now());
-                 Application updatedApplication = applicationRepository.save(application);
-            return mapToApplicationResponse(updatedApplication);
+                Application updatedApplication = applicationRepository.save(application);
+                return mapToApplicationResponse(updatedApplication);
+            } else {
+                return mapToApplicationResponse(application);
+            }
         } else {
-            return mapToApplicationResponse(application);
+            throw new NotFoundCustomException("Application not found with id: " + applicationId);
         }
-    } else {
-        throw new NotFoundCustomException("Application not found with id: " + applicationId);
     }
-}
 
-    public ApplicationResponse addContactToApp(Integer applicationId, Integer contactId,ApplicationRequest applicationRequest) {
+    public ApplicationResponse addContactToApp(Integer applicationId, Integer contactId, ApplicationRequest applicationRequest) {
         Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
             Contact contact = contactRepository.findById(contactId).orElseThrow(() -> new NotFoundCustomException("Contact not found with id: " + contactId));
-            if (contact.getDeletedAt()!=null){
+            if (contact.getDeletedAt() != null) {
                 throw new NotFoundCustomException("Server not found with id : " + contactId);
             }
             List<Contact> contacts = application.getContacts();
@@ -198,7 +232,7 @@ public class ApplicationService {
             Application application = optionalApplication.get();
             Contact contact = contactRepository.findById(contactId).orElseThrow(() -> new NotFoundCustomException("Contact not found with id: " + contactId));
 
-            List<Contact> contacts= application.getContacts();
+            List<Contact> contacts = application.getContacts();
             if (contacts.contains(contact)) {
                 contacts.remove(contact);
                 contact.removeApplication(application);
@@ -214,25 +248,26 @@ public class ApplicationService {
         }
     }
 
-//add get application servers by id and get only the not archived servers
-public List<Server> getNonArchivedApplicationServers(Integer appId) {
-    Optional<Application> optionalApplication = applicationRepository.findById(appId);
-    if (optionalApplication.isPresent()) {
-        Application application = optionalApplication.get();
-        List<Server> servers = new ArrayList<>();
-        for (Server server : application.getServers()) {
-            for (Application serverApp : server.getApplications()) {
-                if (serverApp.getId().equals(application.getId()) && server.getDeletedAt()==null) {
-                    servers.add(server);
-                    break;
+    //add get application servers by id and get only the not archived servers
+    public List<Server> getNonArchivedApplicationServers(Integer appId) {
+        Optional<Application> optionalApplication = applicationRepository.findById(appId);
+        if (optionalApplication.isPresent()) {
+            Application application = optionalApplication.get();
+            List<Server> servers = new ArrayList<>();
+            for (Server server : application.getServers()) {
+                for (Application serverApp : server.getApplications()) {
+                    if (serverApp.getId().equals(application.getId()) && server.getDeletedAt() == null) {
+                        servers.add(server);
+                        break;
+                    }
                 }
             }
+            return servers;
+        } else {
+            throw new NotFoundCustomException("Application not found with id: " + appId);
         }
-        return servers;
-    } else {
-        throw new NotFoundCustomException("Application not found with id: " + appId);
     }
-}
+
     public List<Contact> getNonArchivedApplicationContacts(Integer appId) {
         Optional<Application> optionalApplication = applicationRepository.findById(appId);
         if (optionalApplication.isPresent()) {
@@ -240,7 +275,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
             List<Contact> contacts = new ArrayList<>();
             for (Contact contact : application.getContacts()) {
                 for (Application contactApp : contact.getApplications()) {
-                    if (contactApp.getId().equals(application.getId()) && contact.getDeletedAt()==null) {
+                    if (contactApp.getId().equals(application.getId()) && contact.getDeletedAt() == null) {
                         contacts.add(contact);
                         break;
                     }
@@ -253,30 +288,25 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
     }
 
 
-
-
-
-
-
     public List<ApplicationResponse> getAllApplications(Pageable paging) {
 
         Iterable<Application> apps = applicationRepository.findAll(paging);
 
         List<ApplicationResponse> applicationResponses = new ArrayList<>();
 
-        apps.forEach( application ->
-            applicationResponses.add(ApplicationResponse
-                    .builder()
-                    .id(application.getId())
-                    .appName(application.getAppName())
-                    .appDescription(application.getAppDescription())
-                    .servers(application.getServers())
-                            .contacts((application.getContacts()))
-                            .modifiedAt(application.getModifiedAt())
-                            .deletedAt(application.getDeletedAt())
-                            .createdAt(application.getCreatedAt())
-                    .build())
-    );
+        apps.forEach(application ->
+                applicationResponses.add(ApplicationResponse
+                        .builder()
+                        .id(application.getId())
+                        .appName(application.getAppName())
+                        .appDescription(application.getAppDescription())
+                        .servers(application.getServers())
+                        .contacts((application.getContacts()))
+                        .modifiedAt(application.getModifiedAt())
+                        .deletedAt(application.getDeletedAt())
+                        .createdAt(application.getCreatedAt())
+                        .build())
+        );
 
         return applicationResponses;
     }
@@ -299,7 +329,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
     public ApplicationResponse updateApplication(Integer id, ApplicationRequest applicationRequest) {
         Optional<Application> optionalApplication = applicationRepository.findById(id);
-        LocalDateTime updated =LocalDateTime.now();
+        LocalDateTime updated = LocalDateTime.now();
 
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
@@ -335,7 +365,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
     public void deleteApplicationSoft(Integer id) {
         Optional<Application> optionalApplication = applicationRepository.findById(id);
-        LocalDateTime deleted =LocalDateTime.now();
+        LocalDateTime deleted = LocalDateTime.now();
 
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
@@ -369,8 +399,6 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
     }*/
 
 
-
-
     /*public List<ApplicationResponse> getAllNonArchivedApplications() {
         List<Application> applications = applicationRepository.findAll();
         return applications.stream()
@@ -384,30 +412,7 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
         List<ApplicationResponse> applicationResponses = new ArrayList<>();
 
-        apps.forEach( application ->
-                applicationResponses.add(ApplicationResponse
-                        .builder()
-                        .id(application.getId())
-                        .appName(application.getAppName())
-                        .appDescription(application.getAppDescription())
-                        .servers(application.getServers())
-                        .contacts(application.getContacts())
-                        .createdAt(application.getCreatedAt())
-                                .deletedAt(application.getDeletedAt())
-                                .modifiedAt(application.getModifiedAt())
-                        .build())
-        );
-
-        return applicationResponses;
-    }
-
-    public List<ApplicationResponse> getAllArchivedApplications(Pageable paging) {
-
-        Iterable<Application> apps = applicationRepository.findAllByDeletedAtIsNotNull(paging);
-
-        List<ApplicationResponse> applicationResponses = new ArrayList<>();
-
-        apps.forEach( application ->
+        apps.forEach(application ->
                 applicationResponses.add(ApplicationResponse
                         .builder()
                         .id(application.getId())
@@ -423,13 +428,37 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
 
         return applicationResponses;
     }
-//and not archived
+
+    public List<ApplicationResponse> getAllArchivedApplications(Pageable paging) {
+
+        Iterable<Application> apps = applicationRepository.findAllByDeletedAtIsNotNull(paging);
+
+        List<ApplicationResponse> applicationResponses = new ArrayList<>();
+
+        apps.forEach(application ->
+                applicationResponses.add(ApplicationResponse
+                        .builder()
+                        .id(application.getId())
+                        .appName(application.getAppName())
+                        .appDescription(application.getAppDescription())
+                        .servers(application.getServers())
+                        .contacts(application.getContacts())
+                        .createdAt(application.getCreatedAt())
+                        .deletedAt(application.getDeletedAt())
+                        .modifiedAt(application.getModifiedAt())
+                        .build())
+        );
+
+        return applicationResponses;
+    }
+
+    //and not archived
     public List<ApplicationResponse> findByAppName(String appName) {
 
         List<Application> apps = applicationRepository.findByAppName(appName);
         if (apps != null) {
             return apps.stream()
-                    .filter(app -> app.getDeletedAt()==null)
+                    .filter(app -> app.getDeletedAt() == null)
                     .map(this::mapToApplicationResponse)
                     .toList();
         } else {
@@ -437,13 +466,13 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         }
     }
 
-//and not archived
+    //and not archived
     public ApplicationResponse findById(Integer id) {
         Optional<Application> app = applicationRepository.findById(id);
 
         if (app.isPresent()) {
             Application application = app.get();
-            if (application.getDeletedAt()==null) {
+            if (application.getDeletedAt() != null) {
                 throw new NotFoundCustomException("Application not found with id: " + id);
             }
             return ApplicationResponse
@@ -465,4 +494,35 @@ public List<Server> getNonArchivedApplicationServers(Integer appId) {
         }
 
     }
+/*@Transactional
+    public void addApplicationInterface(Integer applicationId, Integer appSrcId, Integer appDestId, String protocol) {
+        Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
+        if (optionalApplication.isPresent()) {
+            Application application = optionalApplication.get();
+
+
+
+            applicationRepository.addApplicationInterface(application.getId(), appSrcId, appDestId, protocol);
+
+
+        } else {
+            throw new IllegalArgumentException("Application not found");
+        }
+    }*/
+/*@Transactional
+public void addApplicationInterface(Integer applicationId, Integer appSrcId, Integer appDestId, String protocol) {
+    Application application = entityManager.find(Application.class, applicationId);
+    Application appSrc = entityManager.find(Application.class, appSrcId);
+    Application appDest = entityManager.find(Application.class, appDestId);
+
+    ApplicationsInterface applicationsInterface = new ApplicationsInterface();
+    applicationsInterface.setApplication(application);
+    applicationsInterface.setApplicationSrc(appSrc);
+    applicationsInterface.setApplicationDest(appDest);
+    applicationsInterface.setProtocol(protocol);
+
+    entityManager.persist(applicationsInterface);
+}*/
+
+
 }

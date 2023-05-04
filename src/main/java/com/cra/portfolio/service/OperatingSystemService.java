@@ -16,7 +16,8 @@ import java.util.Optional;
 @Slf4j
 public class OperatingSystemService {
 
-    private final OperatingSystemRepository OsRepository ;
+    private final OperatingSystemRepository OsRepository;
+
     public List<OperatingSystem> getAllOS() {
         return OsRepository.findAll();
     }
@@ -28,7 +29,6 @@ public class OperatingSystemService {
     public OperatingSystem createOs(OperatingSystem Os) {
         return OsRepository.save(Os);
     }
-
 
 
 }

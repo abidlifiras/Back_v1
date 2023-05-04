@@ -14,7 +14,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class OperatingSystemController {
     @Autowired
-    private OperatingSystemService operatingSystemService ;
+    private OperatingSystemService operatingSystemService;
 
     @PostMapping
     public ResponseEntity<OperatingSystem> createServer(@RequestBody OperatingSystem Os) {

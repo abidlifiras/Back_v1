@@ -9,10 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 
 @Data
@@ -24,9 +21,10 @@ public class ApplicationResponse {
     private Integer id;
     private String appName;
     private String appDescription;
-    private LocalDateTime deletedAt ;
-    private LocalDateTime createdAt  ;
-    private LocalDateTime modifiedAt ;
+    private LocalDateTime deletedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private List<Server> servers;
-    private List<Contact> contacts ;
+    private List<Contact> contacts;
+
 }

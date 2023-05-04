@@ -2,6 +2,7 @@ package com.cra.portfolio.controller;
 
 import com.cra.portfolio.dto.ContactRequest;
 import com.cra.portfolio.dto.ContactResponse;
+import com.cra.portfolio.dto.DatabaseResponse;
 import com.cra.portfolio.model.Application;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.service.ContactService;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/contacts")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class ContactController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ContactResponse createContact(@RequestBody ContactRequest contactRequest){
+    public ContactResponse createContact(@RequestBody ContactRequest contactRequest) {
         return contactService.createContact(contactRequest);
     }
 
@@ -36,7 +38,7 @@ public class ContactController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ContactResponse> contactResponses =
                 contactService.getAllContact(paging);
@@ -46,20 +48,18 @@ public class ContactController {
     }
 
 
-
-
     @PutMapping("/{contactId}/application/link/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContactResponse> addAppToContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId, @RequestBody ContactRequest contactRequest ) {
-        ContactResponse updatedContact = contactService.addAppToContact(contactId,applicationId,contactRequest);
+    public ResponseEntity<ContactResponse> addAppToContact(@PathVariable Integer applicationId, @PathVariable Integer contactId, @RequestBody ContactRequest contactRequest) {
+        ContactResponse updatedContact = contactService.addAppToContact(contactId, applicationId, contactRequest);
         return ResponseEntity.ok(updatedContact);
     }
 
 
     @PutMapping("/{contactId}/application/unlink/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContactResponse> removeAppFromContact(@PathVariable Integer applicationId ,@PathVariable Integer contactId ) {
-        ContactResponse updatedContact = contactService.removeAppFromContact(contactId,applicationId);
+    public ResponseEntity<ContactResponse> removeAppFromContact(@PathVariable Integer applicationId, @PathVariable Integer contactId) {
+        ContactResponse updatedContact = contactService.removeAppFromContact(contactId, applicationId);
         return ResponseEntity.ok(updatedContact);
     }
 
@@ -77,7 +77,7 @@ public class ContactController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ContactResponse> contactResponses =
                 contactService.getAllArchivedContacts(paging);
@@ -95,7 +95,7 @@ public class ContactController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ContactResponse> contactResponses =
                 contactService.getAllNonArchivedContacts(paging);
@@ -112,7 +112,7 @@ public class ContactController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ContactResponse> updateContact(@PathVariable Integer id, @RequestBody ContactRequest contactRequest) {
-        ContactResponse updatedContact= contactService.updateContact(id, contactRequest);
+        ContactResponse updatedContact = contactService.updateContact(id, contactRequest);
         return ResponseEntity.ok(updatedContact);
     }
 
@@ -128,7 +128,6 @@ public class ContactController {
         return contactService.findById(id);
     }
 
-
-    }
+}
 
 

@@ -4,6 +4,7 @@ import com.cra.portfolio.dto.*;
 import com.cra.portfolio.exception.NotFoundCustomException;
 import com.cra.portfolio.model.Application;
 import com.cra.portfolio.model.Contact;
+import com.cra.portfolio.model.Database;
 import com.cra.portfolio.model.Server;
 import com.cra.portfolio.repository.ApplicationRepository;
 import com.cra.portfolio.repository.ContactRepository;
@@ -39,12 +40,12 @@ public class ContactService {
         return mapToContactResponse(contact);
     }
 
-    public ContactResponse addAppToContact(Integer contactId, Integer applicationId,ContactRequest contactRequest) {
-        Optional<Contact> optionalContact= contactRepository.findById(contactId);
+    public ContactResponse addAppToContact(Integer contactId, Integer applicationId, ContactRequest contactRequest) {
+        Optional<Contact> optionalContact = contactRepository.findById(contactId);
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
             Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new NotFoundCustomException("Application not found with id: " + applicationId));
-            if (application.getDeletedAt()!=null){
+            if (application.getDeletedAt() != null) {
                 throw new NotFoundCustomException("Application not found with id: " + applicationId);
             }
             List<Application> applications = contact.getApplications();
@@ -76,7 +77,7 @@ public class ContactService {
             List<Application> applications = new ArrayList<>();
             for (Application application : contact.getApplications()) {
                 for (Contact appContact : application.getContacts()) {
-                    if (appContact.getId().equals(contact.getId()) && application.getDeletedAt()==null) {
+                    if (appContact.getId().equals(contact.getId()) && application.getDeletedAt() == null) {
                         applications.add(application);
                         break;
                     }
@@ -100,7 +101,7 @@ public class ContactService {
                 application.removeContact(contact);
 
                 contact.setApplications(applications);
-                Contact updatedContact= contactRepository.save(contact);
+                Contact updatedContact = contactRepository.save(contact);
                 return mapToContactResponse(updatedContact);
             } else {
                 return mapToContactResponse(contact);
@@ -116,13 +117,14 @@ public class ContactService {
 
         List<ContactResponse> contactResponses = new ArrayList<>();
 
-        contacts.forEach( contact ->
+        contacts.forEach(contact ->
                 contactResponses.add(ContactResponse
                         .builder()
                         .id(contact.getId())
                         .fullName(contact.getFullName())
                         .department(contact.getDepartment())
                         .title(contact.getTitle())
+                        .email(contact.getEmail())
                         .applications(contact.getApplications())
                         .modifiedAt(contact.getModifiedAt())
                         .deletedAt(contact.getDeletedAt())
@@ -149,7 +151,7 @@ public class ContactService {
     public ContactResponse updateContact(Integer id, ContactRequest contactRequest) {
         Optional<Contact> optionalContact = contactRepository.findById(id);
         if (optionalContact.isPresent()) {
-            LocalDateTime modified =LocalDateTime.now();
+            LocalDateTime modified = LocalDateTime.now();
             Contact contact = optionalContact.get();
             contact.setFullName(contactRequest.getFullName());
             contact.setDepartment(contactRequest.getDepartment());
@@ -167,7 +169,7 @@ public class ContactService {
 
     public void deleteContactSoft(Integer id) {
         Optional<Contact> optionalContact = contactRepository.findById(id);
-        LocalDateTime deleted =LocalDateTime.now();
+        LocalDateTime deleted = LocalDateTime.now();
         if (optionalContact.isPresent()) {
             Contact contact = optionalContact.get();
             contact.setDeletedAt(deleted);
@@ -187,7 +189,7 @@ public class ContactService {
 
         List<ContactResponse> contactResponses = new ArrayList<>();
 
-        contacts.forEach( contact ->
+        contacts.forEach(contact ->
                 contactResponses.add(ContactResponse
                         .builder()
                         .applications(contact.getApplications())
@@ -195,6 +197,7 @@ public class ContactService {
                         .fullName(contact.getFullName())
                         .department(contact.getDepartment())
                         .title(contact.getTitle())
+                        .email(contact.getEmail())
                         .applications(contact.getApplications())
                         .modifiedAt(contact.getModifiedAt())
                         .deletedAt(contact.getDeletedAt())
@@ -204,13 +207,14 @@ public class ContactService {
 
         return contactResponses;
     }
+
     public List<ContactResponse> getAllArchivedContacts(Pageable paging) {
 
-        Iterable<Contact> contacts= contactRepository.findAllByDeletedAtIsNotNull(paging);
+        Iterable<Contact> contacts = contactRepository.findAllByDeletedAtIsNotNull(paging);
 
         List<ContactResponse> contactResponses = new ArrayList<>();
 
-        contacts.forEach( contact ->
+        contacts.forEach(contact ->
                 contactResponses.add(ContactResponse
                         .builder()
                         .applications(contact.getApplications())
@@ -218,6 +222,7 @@ public class ContactService {
                         .fullName(contact.getFullName())
                         .department(contact.getDepartment())
                         .title(contact.getTitle())
+                        .email(contact.getEmail())
                         .applications(contact.getApplications())
                         .modifiedAt(contact.getModifiedAt())
                         .deletedAt(contact.getDeletedAt())
@@ -233,7 +238,7 @@ public class ContactService {
 
         if (contact.isPresent()) {
             Contact cont = contact.get();
-            if (cont.getDeletedAt() != null ) {
+            if (cont.getDeletedAt() != null) {
                 throw new NotFoundCustomException("Contact not found with id: " + id);
             }
             return ContactResponse
@@ -243,6 +248,7 @@ public class ContactService {
                     .fullName(cont.getFullName())
                     .department(cont.getDepartment())
                     .title(cont.getTitle())
+                    .email(cont.getEmail())
                     .applications(cont.getApplications())
                     .modifiedAt(cont.getModifiedAt())
                     .deletedAt(cont.getDeletedAt())
@@ -254,17 +260,6 @@ public class ContactService {
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     private ContactResponse mapToContactResponse(Contact contact) {

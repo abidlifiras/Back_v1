@@ -26,19 +26,26 @@ public class Application {
     private Integer id;
     private String appName;
     private String appDescription;
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private LocalDateTime createdAt = null ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime modifiedAt = null;
+    private LocalDateTime createdAt = null;
     @ManyToMany(mappedBy = "applications", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Server> servers = new ArrayList<>();
 
-    @ManyToMany(cascade={CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "application_contact",
             joinColumns = @JoinColumn(name = "application_id"),
             inverseJoinColumns = @JoinColumn(name = "contact_id"))
     private List<Contact> contacts = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "applicationSrc")
+    List<ApplicationsInterface> appSrcInterfaces = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "applicationTarget")
+    List<ApplicationsInterface> appTargetInterfaces = new ArrayList<>();
+
 
     public void addContact(Contact contact) {
         this.contacts.add(contact);

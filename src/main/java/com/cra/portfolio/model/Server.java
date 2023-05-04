@@ -21,9 +21,9 @@ public class Server {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private LocalDateTime createdAt = null ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime modifiedAt = null;
+    private LocalDateTime createdAt = null;
 
     private String serverName;
     private String dataSource;
@@ -38,7 +38,18 @@ public class Server {
 
     private String operatingSystem;
 
-    @ManyToMany(cascade={CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
+    /*@ManyToOne
+    @JoinColumn(name = "environmentId")
+    private Environment environment;*/
+    @ManyToOne
+    @JoinColumn(name = "dataCenterId")
+    private DataCenter datacenter;
+
+    @ManyToOne
+    @JoinColumn(name = "environmentId")
+    private Environment environment;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "server_database",
             joinColumns = @JoinColumn(name = "server_id"),
@@ -46,7 +57,7 @@ public class Server {
     private List<Database> databaseList = new ArrayList<>();
 
 
-    @ManyToMany(cascade={CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "server_application",
             joinColumns = @JoinColumn(name = "server_id"),
@@ -63,8 +74,6 @@ public class Server {
         database.getServerList().remove(this);
         this.getDatabaseList().remove(database);
     }
-
-
 
 
 }

@@ -29,7 +29,7 @@ public class ServerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createServer(@RequestBody ServerRequest serverRequest){
+    public ServerResponse createServer(@RequestBody ServerRequest serverRequest) {
         return (serverService.createServer(serverRequest));
     }
 
@@ -42,7 +42,7 @@ public class ServerController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ServerResponse> serverResponses =
                 serverService.getAllServers(paging);
@@ -53,27 +53,29 @@ public class ServerController {
 
     @PutMapping("/{serverId}/application/link/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ServerResponse> addAppToServer(@PathVariable Integer serverId ,@PathVariable Integer applicationId, @RequestBody ServerRequest serverRequest ) {
-        ServerResponse updatedServer = serverService.addAppToServer(serverId,applicationId, serverRequest);
+    public ResponseEntity<ServerResponse> addAppToServer(@PathVariable Integer serverId, @PathVariable Integer applicationId, @RequestBody ServerRequest serverRequest) {
+        ServerResponse updatedServer = serverService.addAppToServer(serverId, applicationId, serverRequest);
         return ResponseEntity.ok(updatedServer);
     }
+
     @PutMapping("/{serverId}/application/unlink/{applicationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ServerResponse> removeAppFromServer(@PathVariable Integer serverId ,@PathVariable Integer applicationId) {
-        ServerResponse updatedServer = serverService.removeAppFromServer(serverId,applicationId);
+    public ResponseEntity<ServerResponse> removeAppFromServer(@PathVariable Integer serverId, @PathVariable Integer applicationId) {
+        ServerResponse updatedServer = serverService.removeAppFromServer(serverId, applicationId);
         return ResponseEntity.ok(updatedServer);
     }
 
     @PutMapping("/{serverId}/database/link/{DbId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ServerResponse> addDbToServer(@PathVariable Integer serverId ,@PathVariable Integer DbId, @RequestBody ServerRequest serverRequest ) {
-        ServerResponse updatedServer = serverService.addDbToServer(serverId,DbId, serverRequest);
+    public ResponseEntity<ServerResponse> addDbToServer(@PathVariable Integer serverId, @PathVariable Integer DbId, @RequestBody ServerRequest serverRequest) {
+        ServerResponse updatedServer = serverService.addDbToServer(serverId, DbId, serverRequest);
         return ResponseEntity.ok(updatedServer);
     }
+
     @PutMapping("/{serverId}/database/unlink/{dbId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ServerResponse> removeDbFromServer(@PathVariable Integer serverId ,@PathVariable Integer dbId) {
-        ServerResponse updatedServer = serverService.removeDbFromServer(serverId,dbId);
+    public ResponseEntity<ServerResponse> removeDbFromServer(@PathVariable Integer serverId, @PathVariable Integer dbId) {
+        ServerResponse updatedServer = serverService.removeDbFromServer(serverId, dbId);
         return ResponseEntity.ok(updatedServer);
     }
 
@@ -86,7 +88,7 @@ public class ServerController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ServerResponse> serverResponses =
                 serverService.getAllArchivedServers(paging);
@@ -99,6 +101,7 @@ public class ServerController {
     public List<Application> getNonArchivedServerApplications(@PathVariable Integer serverId) {
         return serverService.getNonArchivedServerApplications(serverId);
     }
+
     @GetMapping("/{serverId}/databases")
     public List<Database> getNonArchivedServerDatabases(@PathVariable Integer serverId) {
         return serverService.getNonArchivedServerDatabases(serverId);
@@ -113,7 +116,7 @@ public class ServerController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<ServerResponse> serverResponses =
                 serverService.getAllNonArchivedServers(paging);
@@ -153,7 +156,21 @@ public class ServerController {
 
     }
 
+    @GetMapping("/all")
+    public List<ServerResponse> getNonArchivedServer() {
+        return serverService.getServerAll();
+    }
 
+    @PutMapping("/{serverId}/datacenter/link/{datacenterId}")
+    public ResponseEntity<ServerResponse> addDatacenterToServer(@PathVariable Integer serverId, @PathVariable Integer datacenterId) {
+        ServerResponse updatedServer = serverService.mapToDataCenter(serverId, datacenterId);
+        return ResponseEntity.ok(updatedServer);
+    }
+    @PutMapping("/{serverId}/environment/link/{environmentId}")
+    public ResponseEntity<ServerResponse> addEnvironmentToServer(@PathVariable Integer serverId, @PathVariable Integer environmentId) {
+        ServerResponse updatedServer = serverService.mapToEnvironment(serverId, environmentId);
+        return ResponseEntity.ok(updatedServer);
+    }
 
 
 }

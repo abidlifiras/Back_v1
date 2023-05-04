@@ -17,11 +17,12 @@ import java.util.*;
 public class ApplicationRequest {
     private String appName;
     private String appDescription;
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime createdAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private List<Server> servers ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime createdAt = null;
+    private LocalDateTime modifiedAt = null;
+    private List<Server> servers;
 
-    private List<Contact> contacts ;
+    private List<Contact> contacts;
+
 
 }

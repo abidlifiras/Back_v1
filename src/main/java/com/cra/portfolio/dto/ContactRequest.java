@@ -8,17 +8,18 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContactRequest {
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private LocalDateTime createdAt = null ;
-    private String fullName ;
-    private String title ;
-    private String department ;
-    private String email ;
-    private List<Application> applications ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime modifiedAt = null;
+    private LocalDateTime createdAt = null;
+    private String fullName;
+    private String title;
+    private String department;
+    private String email;
+    private List<Application> applications;
 }

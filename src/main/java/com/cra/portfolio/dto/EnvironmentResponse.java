@@ -1,6 +1,8 @@
 package com.cra.portfolio.dto;
 
-import com.cra.portfolio.model.Application;
+import com.cra.portfolio.enums.Env;
+import com.cra.portfolio.model.DataCenter;
+import com.cra.portfolio.model.Server;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,15 +15,13 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContactResponse {
+public class EnvironmentResponse {
     private Integer id;
     private LocalDateTime deletedAt = null;
     private LocalDateTime modifiedAt = null;
     private LocalDateTime createdAt = null;
-    private String fullName;
-    private String title;
-    private String department;
-    private String email;
-    private List<Application> applications;
-
+    private String environmentName;
+    private String description;
+    private Env type;
+    private List<Server> servers;
 }

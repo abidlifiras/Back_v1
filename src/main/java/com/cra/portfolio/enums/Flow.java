@@ -1,2 +1,6 @@
-package com.cra.portfolio.enums;public enum Flow {
+package com.cra.portfolio.enums;
+
+public enum Flow {
+    INTERNAL,
+    EXTERNAL
 }

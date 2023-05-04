@@ -10,8 +10,11 @@ import java.util.List;
 
 public interface ServerRepository extends JpaRepository<Server, Integer> {
     List<Server> findByServerName(String serverName);
+
     List<Server> findAllByDeletedAtNull(Pageable paging);
 
-    List<Server> findAllByDeletedAtIsNotNull(Pageable paging) ;
+    List<Server> findAllByDeletedAtIsNull();
+
+    List<Server> findAllByDeletedAtIsNotNull(Pageable paging);
 
 }

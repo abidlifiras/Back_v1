@@ -20,16 +20,16 @@ public class Database {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "database_id")
-    private Integer databaseId ;
+    private Integer databaseId;
     @Column(name = "database_name")
 
     private String databaseName;
     @Column(name = "database_version")
 
-    private String databaseVersion ;
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime modifiedAt = null ;
-    private LocalDateTime createdAt = null ;
+    private String databaseVersion;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime modifiedAt = null;
+    private LocalDateTime createdAt = null;
     @ManyToMany(mappedBy = "databaseList", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Server> serverList = new ArrayList<>();

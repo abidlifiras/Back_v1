@@ -1,4 +1,5 @@
 package com.cra.portfolio.service;
+
 import com.cra.portfolio.dto.DatabaseRequest;
 import com.cra.portfolio.dto.DatabaseResponse;
 import com.cra.portfolio.dto.ServerResponse;
@@ -27,7 +28,6 @@ public class DatabaseService {
     private final ServerRepository serverRepository;
 
 
-
     public DatabaseResponse createDatabase(DatabaseRequest databaseRequest) {
         Database database = Database.builder()
                 .databaseName(databaseRequest.getNameDb())
@@ -37,12 +37,13 @@ public class DatabaseService {
         log.info("database {} created successfully", database.getDatabaseId());
         return mapToDatabaseResponse(database);
     }
+
     public DatabaseResponse addServerToDb(Integer dbId, Integer serverId, DatabaseRequest databaseRequest) {
         Optional<Database> optionalDatabase = databaseRepository.findById(dbId);
         if (optionalDatabase.isPresent()) {
-            Database database= optionalDatabase.get();
+            Database database = optionalDatabase.get();
             Server server = serverRepository.findById(serverId).orElseThrow(() -> new NotFoundCustomException("Server not found with id: " + serverId));
-            if (server.getDeletedAt()!=null){
+            if (server.getDeletedAt() != null) {
                 throw new NotFoundCustomException("server not found with id: " + serverId);
             }
             List<Server> servers = database.getServerList();
@@ -62,8 +63,9 @@ public class DatabaseService {
             throw new NotFoundCustomException("Database not found with id: " + dbId);
         }
     }
+
     public DatabaseResponse removeServerFromDb(Integer dbId, Integer serverId) {
-        Optional<Database> optionalDatabase= databaseRepository.findById(dbId);
+        Optional<Database> optionalDatabase = databaseRepository.findById(dbId);
         if (optionalDatabase.isPresent()) {
             Database database = optionalDatabase.get();
             Server server = serverRepository.findById(serverId).orElseThrow(() -> new NotFoundCustomException("Server not found with id: " + serverId));
@@ -91,7 +93,7 @@ public class DatabaseService {
             List<Server> servers = new ArrayList<>();
             for (Server server : database.getServerList()) {
                 for (Database serverDb : server.getDatabaseList()) {
-                    if (serverDb.getDatabaseId().equals(database.getDatabaseId()) && server.getDeletedAt()==null) {
+                    if (serverDb.getDatabaseId().equals(database.getDatabaseId()) && server.getDeletedAt() == null) {
                         servers.add(server);
                         break;
                     }
@@ -102,27 +104,29 @@ public class DatabaseService {
             throw new NotFoundCustomException("Database not found with id: " + databaseId);
         }
     }
+
     public List<DatabaseResponse> getAllDatabases(Pageable paging) {
 
         Iterable<Database> databases = databaseRepository.findAll(paging);
 
         List<DatabaseResponse> databaseResponses = new ArrayList<>();
 
-        databases.forEach( database ->
+        databases.forEach(database ->
                 databaseResponses.add(DatabaseResponse
                         .builder()
                         .id(database.getDatabaseId())
                         .nameDb(database.getDatabaseName())
                         .versionDb(database.getDatabaseVersion())
                         .serverList(database.getServerList())
-                                .createdAt(database.getCreatedAt())
-                                .modifiedAt(database.getModifiedAt())
-                                .deletedAt(database.getDeletedAt())
+                        .createdAt(database.getCreatedAt())
+                        .modifiedAt(database.getModifiedAt())
+                        .deletedAt(database.getDeletedAt())
                         .build())
         );
 
         return databaseResponses;
     }
+
     public List<DatabaseResponse> getAllNonArchivedDatabases(Pageable paging) {
 
         Iterable<Database> databases = databaseRepository.findAllByDeletedAtNull(paging);
@@ -130,7 +134,7 @@ public class DatabaseService {
         List<DatabaseResponse> databaseResponses = new ArrayList<>();
 
 
-        databases.forEach( database ->
+        databases.forEach(database ->
                 databaseResponses.add(DatabaseResponse
                         .builder()
                         .id(database.getDatabaseId())
@@ -154,7 +158,7 @@ public class DatabaseService {
         List<DatabaseResponse> databaseResponses = new ArrayList<>();
 
 
-        databases.forEach( database ->
+        databases.forEach(database ->
                 databaseResponses.add(DatabaseResponse
                         .builder()
                         .id(database.getDatabaseId())
@@ -198,6 +202,7 @@ public class DatabaseService {
 
 
     }
+
     public DatabaseResponse updateDatabase(Integer id, DatabaseRequest databaseRequest) {
         Optional<Database> optionalDatabase = databaseRepository.findById(id);
         if (optionalDatabase.isPresent()) {
@@ -244,5 +249,6 @@ public class DatabaseService {
                 .modifiedAt(database.getModifiedAt())
                 .build();
     }
+
 
 }

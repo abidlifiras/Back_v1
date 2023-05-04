@@ -1,2 +1,6 @@
-package com.cra.portfolio.enums;public enum ProcessingMode {
+package com.cra.portfolio.enums;
+
+public enum ProcessingMode {
+    BATCH,
+    REAL_TIME
 }

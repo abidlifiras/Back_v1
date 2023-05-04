@@ -26,7 +26,7 @@ public class DatabaseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public DatabaseResponse createDatabase(@RequestBody DatabaseRequest databaseRequest){
+    public DatabaseResponse createDatabase(@RequestBody DatabaseRequest databaseRequest) {
         return databaseService.createDatabase(databaseRequest);
     }
 
@@ -39,7 +39,7 @@ public class DatabaseController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<DatabaseResponse> databaseResponses =
                 databaseService.getAllDatabases(paging);
@@ -50,14 +50,15 @@ public class DatabaseController {
 
     @PutMapping("/{databaseId}/server/link/{serverId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<DatabaseResponse> addServerToDb(@PathVariable Integer databaseId , @PathVariable Integer serverId , @RequestBody DatabaseRequest databaseRequest) {
-        DatabaseResponse updatedDatabase = databaseService.addServerToDb(databaseId ,serverId, databaseRequest);
+    public ResponseEntity<DatabaseResponse> addServerToDb(@PathVariable Integer databaseId, @PathVariable Integer serverId, @RequestBody DatabaseRequest databaseRequest) {
+        DatabaseResponse updatedDatabase = databaseService.addServerToDb(databaseId, serverId, databaseRequest);
         return ResponseEntity.ok(updatedDatabase);
     }
+
     @PutMapping("/{databaseId}/server/unlink/{serverId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<DatabaseResponse> removeServerFromDb(@PathVariable Integer databaseId , @PathVariable Integer serverId ) {
-        DatabaseResponse updatedDatabase = databaseService.removeServerFromDb(databaseId ,serverId);
+    public ResponseEntity<DatabaseResponse> removeServerFromDb(@PathVariable Integer databaseId, @PathVariable Integer serverId) {
+        DatabaseResponse updatedDatabase = databaseService.removeServerFromDb(databaseId, serverId);
         return ResponseEntity.ok(updatedDatabase);
     }
 
@@ -70,7 +71,7 @@ public class DatabaseController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<DatabaseResponse> databaseResponses =
                 databaseService.getAllArchivedDatabases(paging);
@@ -78,10 +79,12 @@ public class DatabaseController {
         return new ResponseEntity<>(
                 databaseResponses, HttpStatus.CREATED);
     }
+
     @GetMapping("/{databaseId}/servers")
     public List<Server> getNonArchivedDatabaseServers(@PathVariable Integer databaseId) {
         return databaseService.getNonArchivedDatabaseServers(databaseId);
     }
+
     @GetMapping("/non-archived")
     public ResponseEntity<List<DatabaseResponse>> getAllNonArchivedDatabase(
             @RequestParam(defaultValue = "5", required = false)
@@ -91,7 +94,7 @@ public class DatabaseController {
 
     ) {
 
-        Pageable paging  = PageRequest.of(page, pageSize);
+        Pageable paging = PageRequest.of(page, pageSize);
 
         List<DatabaseResponse> databaseResponses =
                 databaseService.getAllNonArchivedDatabases(paging);
@@ -112,18 +115,18 @@ public class DatabaseController {
         DatabaseResponse updatedDatabase = databaseService.updateDatabase(id, databaseRequest);
         return ResponseEntity.ok(updatedDatabase);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDatabaseSoft(@PathVariable Integer id) {
         databaseService.deleteDatabaseSoft(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public DatabaseResponse findDatabaseById(@PathVariable Integer id) {
         return databaseService.findById(id);
     }
-
-
 
 
 }

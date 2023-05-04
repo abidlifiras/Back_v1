@@ -1,7 +1,9 @@
 package com.cra.portfolio.dto;
 
 import com.cra.portfolio.model.Application;
+import com.cra.portfolio.model.DataCenter;
 import com.cra.portfolio.model.Database;
+import com.cra.portfolio.model.Environment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +19,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServerRequest {
-    private LocalDateTime deletedAt = null ;
-    private LocalDateTime createdAt = null ;
-    private LocalDateTime modifiedAt = null ;
+    private LocalDateTime deletedAt = null;
+    private LocalDateTime createdAt = null;
+    private LocalDateTime modifiedAt = null;
     private String serverName;
     private String dataSource;
     private String type;
@@ -32,6 +34,8 @@ public class ServerRequest {
     private String ipAddress;
     private String operatingSystem;
     private List<Application> applications;
-    private List<Database> databaseList ;
+    private List<Database> databaseList;
+    private Environment environment;
+    private DataCenter datacenter;
 }
 

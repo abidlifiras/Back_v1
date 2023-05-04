@@ -15,8 +15,8 @@ public class OperatingSystem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String OsName ;
-    private String OsVersion ;
+    private String OsName;
+    private String OsVersion;
 
 
 }
