@@ -3,12 +3,15 @@ package com.cra.portfolio.service;
 import com.cra.portfolio.model.Category;
 import com.cra.portfolio.model.Question;
 import com.cra.portfolio.repository.CategoryRepository;
+import com.cra.portfolio.repository.QuestionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +21,7 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository ;
+    private final QuestionRepository questionRepository ;
     @Autowired
     private QuestionService questionService ;
 
@@ -45,4 +49,6 @@ public class CategoryService {
     public List<Category> getAllCategories(){
         return categoryRepository.findAll();
     }
+
+
 }

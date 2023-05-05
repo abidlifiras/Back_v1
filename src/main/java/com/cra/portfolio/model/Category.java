@@ -28,7 +28,7 @@ public class Category {
     private LocalDateTime modifiedAt = null ;
 
 
-    @OneToMany(mappedBy="category",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="category",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Question> questions;
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)

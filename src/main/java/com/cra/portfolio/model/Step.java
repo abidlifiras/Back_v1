@@ -21,7 +21,7 @@ public class Step {
     private Integer id;
 
     private String step ;
-    @OneToMany(mappedBy="step",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="step",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Category> categories ;
     private LocalDateTime deletedAt = null ;
     private LocalDateTime modifiedAt = null ;

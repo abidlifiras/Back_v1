@@ -29,7 +29,7 @@ public class Assessment {
     private List<Application> applications ;
     private String note ;
 
-    @OneToMany(mappedBy="assessment")
+    @OneToMany(mappedBy="assessment",fetch = FetchType.EAGER)
     private List<Step> steps ;
 
 }

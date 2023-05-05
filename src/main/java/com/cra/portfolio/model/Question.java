@@ -32,13 +32,9 @@ public class Question {
     public enum type{checkbox_group,number,paragraph,radio_group,select,text,textarea} ;
     @Enumerated(EnumType.STRING)
     private type type;
-    @OneToMany(mappedBy="question",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="question",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Option> options;
 
     private String response ;
-    @JsonIgnore
-
-    @OneToOne(mappedBy = "question")
-    private AssessmentResponse assessmentResponse;
 
 }

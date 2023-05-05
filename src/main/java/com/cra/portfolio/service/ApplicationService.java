@@ -33,6 +33,10 @@ public class ApplicationService {
 
     private final AssessmentResponseRepository assessmentResponseRepository;
 
+    @Autowired
+    public AssessmentService assessmentService ;
+
+
 
 
     //add server object to application
@@ -458,29 +462,12 @@ public Optional<Assessment> getApplicationAssessment(Integer applicationId) {
     if (application.getAssessment()==null){
         return Optional.empty();
     }
-    Assessment assessment = assessmentRepository.findById(application.getAssessment().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Assessment with id " + application.getAssessment().getId() + " not found"));
-
-    for (Step step : assessment.getSteps()) {
-        List<Category> categories = step.getCategories();
-
-        for (Category category : categories) {
-            List<Question> questions = category.getQuestions();
-
-            for (Question question : questions) {
-                AssessmentResponse response = assessmentResponseRepository.findByAppIdAndAndQuestion(applicationId, question);
-                if (response == null){
-                    question.setResponse("");
-
-                }
-                else {
-                    question.setResponse(response.getResponse());
-                }
-            }
-        }
-    }
-    return Optional.of(assessment);
+    List<AssessmentResponse> assessmentResponses = assessmentResponseRepository.findByAppId(applicationId);
+    Assessment assessment1 =assessmentService.editQuestionInAssessment(application.getAssessment(),assessmentResponses);
+    return Optional.ofNullable(assessment1);
 }
+
+
     public ApplicationResponse findById(Integer id) {
         Optional<Application> app = applicationRepository.findById(id);
 

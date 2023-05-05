@@ -21,7 +21,7 @@ public class AssessmentResponse {
 
     private Integer appId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "question_id")
     private Question question;
     private LocalDateTime deletedAt = null;
